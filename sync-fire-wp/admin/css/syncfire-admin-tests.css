@@ -1,0 +1,101 @@
+/**
+ * Admin tests styles for the SyncFire plugin.
+ *
+ * @since      1.0.0
+ */
+
+.syncfire-tests-table {
+    margin-top: 20px;
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.syncfire-tests-table th,
+.syncfire-tests-table td {
+    padding: 10px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+}
+
+.syncfire-test-result {
+    display: inline-block;
+    padding: 5px 10px;
+    border-radius: 3px;
+    font-weight: bold;
+}
+
+.syncfire-test-passed {
+    background-color: #dff0d8;
+    color: #3c763d;
+}
+
+.syncfire-test-failed {
+    background-color: #f2dede;
+    color: #a94442;
+}
+
+.syncfire-logs-table {
+    margin-top: 20px;
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.syncfire-logs-table th,
+.syncfire-logs-table td {
+    padding: 10px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+}
+
+.syncfire-log-level {
+    display: inline-block;
+    padding: 3px 8px;
+    border-radius: 3px;
+    font-weight: bold;
+}
+
+.syncfire-log-level-info {
+    background-color: #d9edf7;
+    color: #31708f;
+}
+
+.syncfire-log-level-warning {
+    background-color: #fcf8e3;
+    color: #8a6d3b;
+}
+
+.syncfire-log-level-error {
+    background-color: #f2dede;
+    color: #a94442;
+}
+
+.syncfire-log-level-success {
+    background-color: #dff0d8;
+    color: #3c763d;
+}
+
+.syncfire-filters {
+    margin-bottom: 20px;
+}
+
+.syncfire-filters form {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.syncfire-log-info {
+    background-color: #f9f9f9;
+}
+
+.syncfire-log-warning {
+    background-color: #fffbf0;
+}
+
+.syncfire-log-error {
+    background-color: #fff0f0;
+}
+
+.syncfire-log-success {
+    background-color: #f0fff0;
+}

@@ -1,0 +1,8 @@
+zend_extension=xdebug.so
+
+[xdebug]
+xdebug.mode=debug
+xdebug.start_with_request=yes
+xdebug.client_host=host.docker.internal   # 主機的 IP 地址，如果是在 Mac 或 Windows 則使用此參數
+xdebug.client_port=9003
+xdebug.log=/var/log/xdebug.log

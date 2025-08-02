@@ -1,0 +1,351 @@
+# Copyright (C) 2025 SyncFire Team
+# This file is distributed under the GPL v2 or later.
+msgid ""
+msgstr ""
+"Project-Id-Version: SyncFire 1.0.0\n"
+"Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/sync-fire\n"
+"POT-Creation-Date: 2025-08-01T14:09:46+07:00\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"PO-Revision-Date: 2025-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+
+#: sync-fire.php:85
+msgid "SyncFire"
+msgstr ""
+
+#: sync-fire.php:95
+msgid "Settings"
+msgstr ""
+
+#: admin/partials/syncfire-admin-display.php:28
+msgid "SyncFire - WordPress to Firestore Synchronization"
+msgstr ""
+
+#: admin/partials/syncfire-admin-display.php:29
+msgid "Synchronize your WordPress taxonomies and post types with Google Firestore."
+msgstr ""
+
+#: admin/partials/syncfire-admin-display.php:34
+msgid "Dashboard"
+msgstr ""
+
+#: admin/partials/syncfire-admin-display.php:35
+#: admin/partials/syncfire-admin-display.php:41
+msgid "Settings"
+msgstr ""
+
+#: admin/partials/syncfire-admin-display.php:47
+msgid "Firebase Connection Status"
+msgstr ""
+
+#: admin/partials/syncfire-admin-display.php:55
+msgid "Connected to Firestore"
+msgstr ""
+
+#: admin/partials/syncfire-admin-display.php:59
+msgid "Not connected to Firestore"
+msgstr ""
+
+#: admin/partials/syncfire-admin-display.php:61
+msgid "Please check your Firebase configuration in the Settings tab."
+msgstr ""
+
+#: admin/partials/syncfire-admin-display.php:64
+msgid "Test Connection"
+msgstr ""
+
+#: admin/partials/syncfire-admin-display.php:71
+msgid "Synchronization Actions"
+msgstr ""
+
+#: admin/partials/syncfire-admin-display.php:74
+msgid "Sync All Post Types"
+msgstr ""
+
+#: admin/partials/syncfire-admin-display.php:75
+msgid "Synchronize all configured post types and their related taxonomies to Firestore."
+msgstr ""
+
+#: admin/partials/syncfire-admin-display.php:77
+msgid "Sync All"
+msgstr ""
+
+#: admin/partials/syncfire-admin-display.php:82
+msgid "Sync Taxonomies"
+msgstr ""
+
+#: admin/partials/syncfire-admin-display.php:83
+msgid "Synchronize selected taxonomies to Firestore."
+msgstr ""
+
+#: admin/partials/syncfire-admin-display.php:88
+msgid "No taxonomies configured for synchronization."
+msgstr ""
+
+#: admin/partials/syncfire-admin-display.php:97
+msgid "Sync Selected Taxonomy"
+msgstr ""
+
+#: admin/partials/syncfire-admin-display.php:105
+msgid "Synchronization Status"
+msgstr ""
+
+#: admin/partials/syncfire-admin-display.php:107
+msgid "No synchronization has been performed yet."
+msgstr ""
+
+#: admin/partials/syncfire-settings-display.php:28
+msgid "SyncFire Settings"
+msgstr ""
+
+#: admin/partials/syncfire-settings-display.php:29
+msgid "Configure your Firebase settings and synchronization options."
+msgstr ""
+
+#: admin/partials/syncfire-settings-display.php:44
+msgid "Firebase Configuration"
+msgstr ""
+
+#: admin/partials/syncfire-settings-display.php:53
+msgid "API Key"
+msgstr ""
+
+#: admin/partials/syncfire-settings-display.php:56
+msgid "Your Firebase API Key."
+msgstr ""
+
+#: admin/partials/syncfire-settings-display.php:61
+msgid "Auth Domain"
+msgstr ""
+
+#: admin/partials/syncfire-settings-display.php:64
+msgid "Your Firebase Auth Domain."
+msgstr ""
+
+#: admin/partials/syncfire-settings-display.php:69
+msgid "Project ID"
+msgstr ""
+
+#: admin/partials/syncfire-settings-display.php:72
+msgid "Your Firebase Project ID."
+msgstr ""
+
+#: admin/partials/syncfire-settings-display.php:77
+msgid "Storage Bucket"
+msgstr ""
+
+#: admin/partials/syncfire-settings-display.php:80
+msgid "Your Firebase Storage Bucket."
+msgstr ""
+
+#: admin/partials/syncfire-settings-display.php:85
+msgid "Messaging Sender ID"
+msgstr ""
+
+#: admin/partials/syncfire-settings-display.php:88
+msgid "Your Firebase Messaging Sender ID."
+msgstr ""
+
+#: admin/partials/syncfire-settings-display.php:93
+msgid "App ID"
+msgstr ""
+
+#: admin/partials/syncfire-settings-display.php:96
+msgid "Your Firebase App ID."
+msgstr ""
+
+#: admin/partials/syncfire-settings-display.php:103
+msgid "Taxonomy Synchronization"
+msgstr ""
+
+#: admin/partials/syncfire-settings-display.php:112
+msgid "Taxonomies to Sync"
+msgstr ""
+
+#: admin/partials/syncfire-settings-display.php:127
+msgid "Select the taxonomies you want to synchronize with Firestore."
+msgstr ""
+
+#: admin/partials/syncfire-settings-display.php:132
+msgid "Order Field"
+msgstr ""
+
+#: admin/partials/syncfire-settings-display.php:136
+msgid "Name"
+msgstr ""
+
+#: admin/partials/syncfire-settings-display.php:137
+msgid "Slug"
+msgstr ""
+
+#: admin/partials/syncfire-settings-display.php:138
+msgid "Description"
+msgstr ""
+
+#: admin/partials/syncfire-settings-display.php:140
+msgid "Select the field to use for ordering the taxonomy terms."
+msgstr ""
+
+#: admin/partials/syncfire-settings-display.php:145
+msgid "Sort Order"
+msgstr ""
+
+#: admin/partials/syncfire-settings-display.php:149
+msgid "Ascending"
+msgstr ""
+
+#: admin/partials/syncfire-settings-display.php:150
+msgid "Descending"
+msgstr ""
+
+#: admin/partials/syncfire-settings-display.php:152
+msgid "Select the sort order for the taxonomy terms."
+msgstr ""
+
+#: admin/partials/syncfire-settings-display.php:159
+msgid "Post Type Synchronization"
+msgstr ""
+
+#: admin/partials/syncfire-settings-display.php:168
+msgid "Post Types to Sync"
+msgstr ""
+
+#: admin/partials/syncfire-settings-display.php:189
+msgid "Select the post types you want to synchronize with Firestore."
+msgstr ""
+
+#: admin/partials/syncfire-settings-display.php:210
+msgid "Fields"
+msgstr ""
+
+#: admin/partials/syncfire-settings-display.php:215
+msgid "Fields to Sync"
+msgstr ""
+
+#: admin/partials/syncfire-settings-display.php:222
+msgid "ID"
+msgstr ""
+
+#: admin/partials/syncfire-settings-display.php:223
+msgid "Title"
+msgstr ""
+
+#: admin/partials/syncfire-settings-display.php:224
+msgid "Content"
+msgstr ""
+
+#: admin/partials/syncfire-settings-display.php:225
+msgid "Excerpt"
+msgstr ""
+
+#: admin/partials/syncfire-settings-display.php:226
+msgid "Slug"
+msgstr ""
+
+#: admin/partials/syncfire-settings-display.php:227
+msgid "Date"
+msgstr ""
+
+#: admin/partials/syncfire-settings-display.php:228
+msgid "Modified Date"
+msgstr ""
+
+#: admin/partials/syncfire-settings-display.php:229
+msgid "Author"
+msgstr ""
+
+#: admin/partials/syncfire-settings-display.php:230
+msgid "Status"
+msgstr ""
+
+#: admin/partials/syncfire-settings-display.php:231
+msgid "Featured Image"
+msgstr ""
+
+#: admin/partials/syncfire-settings-display.php:246
+#: admin/partials/syncfire-settings-display.php:264
+msgid "Taxonomies"
+msgstr ""
+
+#: admin/partials/syncfire-settings-display.php:282
+msgid "Custom Fields"
+msgstr ""
+
+#: admin/partials/syncfire-settings-display.php:283
+msgid "Custom fields will be detected automatically when posts are synchronized."
+msgstr ""
+
+#: admin/partials/syncfire-settings-display.php:289
+msgid "Field Mapping"
+msgstr ""
+
+#: admin/partials/syncfire-settings-display.php:290
+msgid "Map WordPress fields to Firestore document fields."
+msgstr ""
+
+#: admin/partials/syncfire-settings-display.php:294
+msgid "WordPress Field"
+msgstr ""
+
+#: admin/partials/syncfire-settings-display.php:295
+msgid "Firestore Field"
+msgstr ""
+
+#: admin/partials/syncfire-settings-display.php:318
+msgid "Save Settings"
+msgstr ""
+
+#: includes/class-syncfire-admin.php:137
+msgid "You do not have sufficient permissions to perform this action."
+msgstr ""
+
+#: includes/class-syncfire-admin.php:142
+msgid "Security check failed."
+msgstr ""
+
+#: includes/class-syncfire-admin.php:155
+msgid "All post types and taxonomies have been successfully synced to Firestore."
+msgstr ""
+
+#: includes/class-syncfire-admin.php:157
+msgid "There was an error syncing to Firestore. Please check your settings and try again."
+msgstr ""
+
+#: includes/class-syncfire-admin.php:171
+msgid "You do not have sufficient permissions to perform this action."
+msgstr ""
+
+#: includes/class-syncfire-admin.php:176
+msgid "Security check failed."
+msgstr ""
+
+#: includes/class-syncfire-admin.php:181
+msgid "No taxonomy specified."
+msgstr ""
+
+#: includes/class-syncfire-admin.php:192
+msgid "Taxonomy %s has been successfully synced to Firestore."
+msgstr ""
+
+#: includes/class-syncfire-admin.php:194
+msgid "There was an error syncing taxonomy %s to Firestore. Please check your settings and try again."
+msgstr ""
+
+#: includes/class-syncfire-admin.php:208
+msgid "You do not have sufficient permissions to perform this action."
+msgstr ""
+
+#: includes/class-syncfire-admin.php:213
+msgid "Security check failed."
+msgstr ""
+
+#: includes/class-syncfire-admin.php:224
+msgid "Successfully connected to Firestore."
+msgstr ""
+
+#: includes/class-syncfire-admin.php:226
+msgid "Failed to connect to Firestore. Please check your Firebase configuration settings."
+msgstr ""

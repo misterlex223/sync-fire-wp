@@ -1,0 +1,120 @@
+/**
+ * All of the CSS for your admin-specific functionality should be
+ * included in this file.
+ */
+
+.syncfire-admin-container {
+    margin: 20px 0;
+}
+
+.syncfire-admin-header {
+    margin-bottom: 20px;
+}
+
+.syncfire-admin-header h2 {
+    margin-bottom: 10px;
+}
+
+.syncfire-card {
+    background: #fff;
+    border: 1px solid #ccd0d4;
+    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.04);
+    margin-bottom: 20px;
+    padding: 15px;
+}
+
+.syncfire-card h3 {
+    margin-top: 0;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 10px;
+}
+
+.syncfire-connection-status {
+    margin: 15px 0;
+}
+
+.syncfire-status-success {
+    color: #46b450;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.syncfire-status-error {
+    color: #dc3232;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.syncfire-status-success .dashicons,
+.syncfire-status-error .dashicons {
+    margin-right: 5px;
+}
+
+.syncfire-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+.syncfire-action {
+    flex: 1;
+    min-width: 250px;
+}
+
+.syncfire-action h4 {
+    margin-top: 0;
+}
+
+.syncfire-settings-section {
+    background: #fff;
+    border: 1px solid #ccd0d4;
+    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.04);
+    margin-bottom: 20px;
+    padding: 15px;
+}
+
+.syncfire-settings-section h3 {
+    margin-top: 0;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 10px;
+}
+
+.syncfire-post-type-fields {
+    margin-top: 20px;
+    padding: 15px;
+    background: #f9f9f9;
+    border: 1px solid #e5e5e5;
+}
+
+.syncfire-field-mapping {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.syncfire-field-mapping th,
+.syncfire-field-mapping td {
+    padding: 8px;
+    text-align: left;
+    border-bottom: 1px solid #e5e5e5;
+}
+
+#syncfire-sync-status {
+    padding: 10px;
+    background-color: #f9f9f9;
+    border-left: 4px solid #0073aa;
+}
+
+/* Responsive adjustments */
+@media screen and (max-width: 782px) {
+    .syncfire-actions {
+        flex-direction: column;
+    }
+    
+    .syncfire-action {
+        width: 100%;
+    }
+}

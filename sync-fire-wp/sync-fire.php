@@ -81,6 +81,10 @@ class SyncFire {
         require_once SYNCFIRE_PLUGIN_DIR . 'includes/class-syncfire-taxonomy-sync.php';
         require_once SYNCFIRE_PLUGIN_DIR . 'includes/class-syncfire-post-type-sync.php';
         require_once SYNCFIRE_PLUGIN_DIR . 'includes/class-syncfire-firestore.php';
+        require_once plugin_dir_path( __FILE__ ) . 'includes/class-syncfire-options.php';
+        require_once plugin_dir_path( __FILE__ ) . 'includes/syncfire-functions.php';
+        require_once plugin_dir_path( __FILE__ ) . 'includes/class-syncfire-settings-test.php';
+        require_once plugin_dir_path( __FILE__ ) . 'includes/class-syncfire-migration.php';
     }
 
     /**
@@ -98,19 +102,25 @@ class SyncFire {
         add_action('admin_init', array($this, 'clear_options_cache'), 5);
 
         // 添加設定更新記錄鎖子
-        add_action('pre_update_option_syncfire_firebase_api_key', array($this, 'log_option_update'), 10, 3);
-        add_action('pre_update_option_syncfire_firebase_auth_domain', array($this, 'log_option_update'), 10, 3);
-        add_action('pre_update_option_syncfire_firebase_project_id', array($this, 'log_option_update'), 10, 3);
-        add_action('pre_update_option_syncfire_firebase_storage_bucket', array($this, 'log_option_update'), 10, 3);
-        add_action('pre_update_option_syncfire_firebase_messaging_sender_id', array($this, 'log_option_update'), 10, 3);
-        add_action('pre_update_option_syncfire_firebase_app_id', array($this, 'log_option_update'), 10, 3);
-        add_action('pre_update_option_syncfire_firebase_service_account', array($this, 'log_option_update'), 10, 3);
+        add_action('pre_update_option_' . SyncFire_Options::FIREBASE_API_KEY, array($this, 'log_option_update'), 10, 3);
+        add_action('pre_update_option_' . SyncFire_Options::FIREBASE_AUTH_DOMAIN, array($this, 'log_option_update'), 10, 3);
+        add_action('pre_update_option_' . SyncFire_Options::FIREBASE_PROJECT_ID, array($this, 'log_option_update'), 10, 3);
+        add_action('pre_update_option_' . SyncFire_Options::FIREBASE_STORAGE_BUCKET, array($this, 'log_option_update'), 10, 3);
+        add_action('pre_update_option_' . SyncFire_Options::FIREBASE_MESSAGING_SENDER_ID, array($this, 'log_option_update'), 10, 3);
+        add_action('pre_update_option_' . SyncFire_Options::FIREBASE_APP_ID, array($this, 'log_option_update'), 10, 3);
+        add_action('pre_update_option_' . SyncFire_Options::FIREBASE_SERVICE_ACCOUNT, array($this, 'log_option_update'), 10, 3);
 
         // 添加設定更新後的鎖子
         add_action('updated_option', array($this, 'log_updated_option'), 10, 3);
 
         // 添加表單提交調試鎖子
         add_action('admin_init', array($this, 'debug_form_submission'));
+        
+        // 添加設定測試鎖子
+        add_action('admin_init', 'syncfire_test_settings', 999);
+        
+        // 添加表單提交記錄鎖子
+        add_action('admin_init', 'syncfire_log_form_submission');
 
         // Plugin activation/deactivation hooks
         register_activation_hook(__FILE__, array($this, 'activate'));
@@ -151,57 +161,49 @@ class SyncFire {
      * @return void
      */
     public function register_settings() {
-        // 所有設定統一使用一個群組 'syncfire_settings'
-
         // Firebase settings
-        register_setting(
-            'syncfire_settings',
-            'syncfire_firebase_api_key',
+        syncfire_register_option(
+            SyncFire_Options::FIREBASE_API_KEY,
             array(
                 'type' => 'string',
                 'sanitize_callback' => 'sanitize_text_field',
                 'default' => '',
             )
         );
-        register_setting(
-            'syncfire_settings',
-            'syncfire_firebase_auth_domain',
+        syncfire_register_option(
+            SyncFire_Options::FIREBASE_AUTH_DOMAIN,
             array(
                 'type' => 'string',
                 'sanitize_callback' => 'sanitize_text_field',
                 'default' => '',
             )
         );
-        register_setting(
-            'syncfire_settings',
-            'syncfire_firebase_project_id',
+        syncfire_register_option(
+            SyncFire_Options::FIREBASE_PROJECT_ID,
             array(
                 'type' => 'string',
                 'sanitize_callback' => 'sanitize_text_field',
                 'default' => '',
             )
         );
-        register_setting(
-            'syncfire_settings',
-            'syncfire_firebase_storage_bucket',
+        syncfire_register_option(
+            SyncFire_Options::FIREBASE_STORAGE_BUCKET,
             array(
                 'type' => 'string',
                 'sanitize_callback' => 'sanitize_text_field',
                 'default' => '',
             )
         );
-        register_setting(
-            'syncfire_settings',
-            'syncfire_firebase_messaging_sender_id',
+        syncfire_register_option(
+            SyncFire_Options::FIREBASE_MESSAGING_SENDER_ID,
             array(
                 'type' => 'string',
                 'sanitize_callback' => 'sanitize_text_field',
                 'default' => '',
             )
         );
-        register_setting(
-            'syncfire_settings',
-            'syncfire_firebase_app_id',
+        syncfire_register_option(
+            SyncFire_Options::FIREBASE_APP_ID,
             array(
                 'type' => 'string',
                 'sanitize_callback' => 'sanitize_text_field',
@@ -210,9 +212,8 @@ class SyncFire {
         );
 
         // Service Account JSON 設定
-        register_setting(
-            'syncfire_settings',
-            'syncfire_firebase_service_account',
+        syncfire_register_option(
+            SyncFire_Options::FIREBASE_SERVICE_ACCOUNT,
             array(
                 'type' => 'string',
                 'sanitize_callback' => 'sanitize_textarea_field',
@@ -221,27 +222,24 @@ class SyncFire {
         );
 
         // Taxonomy sync settings
-        register_setting(
-            'syncfire_settings',
-            'syncfire_taxonomies_to_sync',
+        syncfire_register_option(
+            SyncFire_Options::TAXONOMIES_TO_SYNC,
             array(
                 'type' => 'array',
-                'sanitize_callback' => array($this, 'sanitize_array'),
+                'sanitize_callback' => 'syncfire_sanitize_array',
                 'default' => array(),
             )
         );
-        register_setting(
-            'syncfire_settings',
-            'syncfire_taxonomy_order_field',
+        syncfire_register_option(
+            SyncFire_Options::TAXONOMY_ORDER_FIELD,
             array(
                 'type' => 'string',
                 'sanitize_callback' => 'sanitize_text_field',
                 'default' => '',
             )
         );
-        register_setting(
-            'syncfire_settings',
-            'syncfire_taxonomy_sort_order',
+        syncfire_register_option(
+            SyncFire_Options::TAXONOMY_SORT_ORDER,
             array(
                 'type' => 'string',
                 'sanitize_callback' => 'sanitize_text_field',
@@ -250,30 +248,27 @@ class SyncFire {
         );
 
         // Post type sync settings
-        register_setting(
-            'syncfire_settings',
-            'syncfire_post_types_to_sync',
+        syncfire_register_option(
+            SyncFire_Options::POST_TYPES_TO_SYNC,
             array(
                 'type' => 'array',
-                'sanitize_callback' => array($this, 'sanitize_array'),
+                'sanitize_callback' => 'syncfire_sanitize_array',
                 'default' => array(),
             )
         );
-        register_setting(
-            'syncfire_settings',
-            'syncfire_post_type_fields',
+        syncfire_register_option(
+            SyncFire_Options::POST_TYPE_FIELDS,
             array(
                 'type' => 'array',
-                'sanitize_callback' => array($this, 'sanitize_array'),
+                'sanitize_callback' => 'syncfire_sanitize_array',
                 'default' => array(),
             )
         );
-        register_setting(
-            'syncfire_settings',
-            'syncfire_post_type_field_mapping',
+        syncfire_register_option(
+            SyncFire_Options::POST_TYPE_FIELD_MAPPING,
             array(
                 'type' => 'array',
-                'sanitize_callback' => array($this, 'sanitize_array'),
+                'sanitize_callback' => 'syncfire_sanitize_array',
                 'default' => array(),
             )
         );
@@ -425,45 +420,81 @@ class SyncFire {
      * @return void
      */
     public function debug_form_submission() {
-        // 只在表單提交後執行
-        if (!empty($_POST)) {
-            // 建立日誌檔案
-            $log_file = SYNCFIRE_PLUGIN_DIR . 'logs/form_submission.log';
+        if (empty($_POST) || !isset($_POST['option_page'])) {
+            return;
+        }
+        if ($_POST['option_page'] !== SyncFire_Options::GROUP) {
+            return;
+        }
 
-            // 確保日誌目錄存在
-            if (!file_exists(SYNCFIRE_PLUGIN_DIR . 'logs')) {
-                mkdir(SYNCFIRE_PLUGIN_DIR . 'logs', 0755, true);
-            }
+        // Use the helper function to log form submission
+        syncfire_log_form_submission($_POST);
 
-            // 記錄表單提交的數據
-            $log_message = date('[Y-m-d H:i:s]') . " 表單提交數據\n";
-            $log_message .= "REQUEST_URI: " . $_SERVER['REQUEST_URI'] . "\n";
-            $log_message .= "HTTP_REFERER: " . (isset($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : 'N/A') . "\n";
-            $log_message .= "POST 數據:\n" . print_r($_POST, true) . "\n";
+        // Additional debug logging for specific option changes
+        $this->log_option_changes();
+    }
 
-            // 檢查是否為設定表單提交
-            if (isset($_POST['option_page']) && $_POST['option_page'] === 'syncfire_settings') {
-                $log_message .= "\n設定表單提交詳細資訊:\n";
-                $log_message .= "option_page: " . $_POST['option_page'] . "\n";
-                $log_message .= "action: " . (isset($_POST['action']) ? $_POST['action'] : 'N/A') . "\n";
+    /**
+     * Log changes to options by comparing POST data with current option values
+     *
+     * @since 1.0.0
+     * @return void
+     */
+    private function log_option_changes() {
+        $log_file = SYNCFIRE_PLUGIN_DIR . 'logs/option_changes.log';
+        $log_dir = dirname($log_file);
 
-                // 檢查是否包含 Firebase 設定欄位
-                $firebase_fields = array(
-                    'syncfire_firebase_api_key',
-                    'syncfire_firebase_auth_domain',
-                    'syncfire_firebase_project_id',
-                    'syncfire_firebase_storage_bucket',
-                    'syncfire_firebase_messaging_sender_id',
-                    'syncfire_firebase_app_id',
-                    'syncfire_firebase_service_account'
-                );
+        // Ensure log directory exists
+        if (!file_exists($log_dir)) {
+            mkdir($log_dir, 0755, true);
+        }
 
-                foreach ($firebase_fields as $field) {
-                    $log_message .= "$field: " . (isset($_POST[$field]) ? $_POST[$field] : 'N/A') . "\n";
+        $log_message = date('[Y-m-d H:i:s]') . " Option Changes\n";
+        $changes_detected = false;
+
+        // Get all option names from the Options class
+        $all_options = SyncFire_Options::get_all_options();
+
+        // Check each option for changes
+        foreach ($all_options as $option_name) {
+            if (isset($_POST[$option_name])) {
+                $current_value = syncfire_get_option($option_name, '');
+                $new_value = $_POST[$option_name];
+
+                // Handle array values
+                if (is_array($new_value)) {
+                    $new_value_str = implode(', ', $new_value);
+                    $current_value_str = is_array($current_value) ? implode(', ', $current_value) : $current_value;
+
+                    if ($new_value_str !== $current_value_str) {
+                        $log_message .= "$option_name: Changed from [$current_value_str] to [$new_value_str]\n";
+                        $changes_detected = true;
+                    }
+                } else {
+                    // For sensitive options, just log that it was changed, not the actual value
+                    if (in_array($option_name, array(
+                        SyncFire_Options::FIREBASE_API_KEY,
+                        SyncFire_Options::FIREBASE_APP_ID,
+                        SyncFire_Options::FIREBASE_SERVICE_ACCOUNT
+                    ))) {
+                        if ($new_value !== $current_value) {
+                            $log_message .= "$option_name: Changed (sensitive value)\n";
+                            $changes_detected = true;
+                        }
+                    } else {
+                        // For non-sensitive options, log the actual values
+                        if ($new_value !== $current_value) {
+                            $log_message .= "$option_name: Changed from [$current_value] to [$new_value]\n";
+                            $changes_detected = true;
+                        }
+                    }
                 }
             }
+        }
 
-            // 寫入日誌
+        // Only write to log if changes were detected
+        if ($changes_detected) {
+            $log_message .= "\n--------------------------------------------------\n";
             file_put_contents($log_file, $log_message, FILE_APPEND);
         }
     }
@@ -481,21 +512,7 @@ class SyncFire {
         $log_message = date('[Y-m-d H:i:s]') . " 清除選項快取\n";
 
         // 強制重新讀取已註冊的選項
-        $options = array(
-            'syncfire_firebase_api_key',
-            'syncfire_firebase_auth_domain',
-            'syncfire_firebase_project_id',
-            'syncfire_firebase_storage_bucket',
-            'syncfire_firebase_messaging_sender_id',
-            'syncfire_firebase_app_id',
-            'syncfire_firebase_service_account',
-            'syncfire_taxonomies_to_sync',
-            'syncfire_taxonomy_order_field',
-            'syncfire_taxonomy_sort_order',
-            'syncfire_post_types_to_sync',
-            'syncfire_post_type_fields',
-            'syncfire_post_type_field_mapping'
-        );
+        $options = SyncFire_Options::get_all_options();
 
         foreach ($options as $option) {
             // 強制重新讀取選項值
@@ -505,8 +522,7 @@ class SyncFire {
 
             // 如果選項不存在，則初始化它
             if ($value === false || $value === '') {
-                if (strpos($option, '_array') !== false ||
-                    in_array($option, array('syncfire_taxonomies_to_sync', 'syncfire_post_types_to_sync', 'syncfire_post_type_fields', 'syncfire_post_type_field_mapping'))) {
+                if (in_array($option, SyncFire_Options::get_array_options())) {
                     update_option($option, array());
                     $log_message .= "  - 初始化陣列選項: {$option}\n";
                 } else {

@@ -14,6 +14,11 @@
 if (!defined('ABSPATH')) {
     exit;
 }
+
+// Ensure the options class is loaded
+if (!class_exists('SyncFire_Options')) {
+    require_once SYNCFIRE_PLUGIN_DIR . 'includes/class-syncfire-options.php';
+}
 ?>
 
 <div class="wrap">
@@ -35,12 +40,12 @@ if (!defined('ABSPATH')) {
                 <div class="syncfire-settings">
                     <?php
                     // 調試信息：檢查選項值是否存在
-                    $api_key = get_option('syncfire_firebase_api_key', '');
-                    $auth_domain = get_option('syncfire_firebase_auth_domain', '');
-                    $project_id = get_option('syncfire_firebase_project_id', '');
-                    $storage_bucket = get_option('syncfire_firebase_storage_bucket', '');
-                    $messaging_sender_id = get_option('syncfire_firebase_messaging_sender_id', '');
-                    $app_id = get_option('syncfire_firebase_app_id', '');
+                    $api_key = syncfire_get_option(SyncFire_Options::FIREBASE_API_KEY, '');
+                    $auth_domain = syncfire_get_option(SyncFire_Options::FIREBASE_AUTH_DOMAIN, '');
+                    $project_id = syncfire_get_option(SyncFire_Options::FIREBASE_PROJECT_ID, '');
+                    $storage_bucket = syncfire_get_option(SyncFire_Options::FIREBASE_STORAGE_BUCKET, '');
+                    $messaging_sender_id = syncfire_get_option(SyncFire_Options::FIREBASE_MESSAGING_SENDER_ID, '');
+                    $app_id = syncfire_get_option(SyncFire_Options::FIREBASE_APP_ID, '');
 
                     // 在頁面頂部顯示詳細的調試信息
                     echo '<div class="notice notice-info is-dismissible"><p>';
@@ -78,8 +83,8 @@ if (!defined('ABSPATH')) {
 
                     <form method="post" action="<?php echo admin_url('options.php'); ?>" class="syncfire-settings-form">
                         <?php
-                        // 顯示設定欄位的隱藏輸入 - 統一使用 syncfire_settings 群組
-                        settings_fields('syncfire_settings');
+                        // 顯示設定欄位的隱藏輸入 - 使用常數定義的群組
+                        settings_fields(SyncFire_Options::GROUP);
 
                         // 手動添加隱藏欄位，確保選項頁面正確
                         echo '<input type="hidden" name="option_page" value="syncfire_settings" />';
@@ -90,7 +95,7 @@ if (!defined('ABSPATH')) {
                         echo '<strong>隱藏欄位值</strong><br>';
                         echo 'Nonce: ' . $nonce . '<br>';
                         echo 'Action: ' . 'update' . '<br>';
-                        echo 'Option page: ' . 'syncfire_settings' . '<br>';
+                        echo 'Option page: ' . SyncFire_Options::GROUP . '<br>';
                         echo '</p></div>';
                         ?>
 
@@ -100,7 +105,7 @@ if (!defined('ABSPATH')) {
                             <table class="form-table">
                                 <tr>
                                     <th scope="row">
-                                        <label for="syncfire_firebase_api_key"><?php _e('API Key', 'sync-fire'); ?></label>
+                                        <label for="<?php echo SyncFire_Options::FIREBASE_API_KEY; ?>"><?php _e('API Key', 'sync-fire'); ?></label>
                                     </th>
                                     <td>
                                         <input type="password" name="syncfire_firebase_api_key" id="syncfire_firebase_api_key" class="regular-text" value="<?php echo esc_attr(get_option('syncfire_firebase_api_key', '')); ?>" />
@@ -109,7 +114,7 @@ if (!defined('ABSPATH')) {
                                 </tr>
                                 <tr>
                                     <th scope="row">
-                                        <label for="syncfire_firebase_auth_domain"><?php _e('Auth Domain', 'sync-fire'); ?></label>
+                                        <label for="<?php echo SyncFire_Options::FIREBASE_AUTH_DOMAIN; ?>"><?php _e('Auth Domain', 'sync-fire'); ?></label>
                                     </th>
                                     <td>
                                         <input type="text" name="syncfire_firebase_auth_domain" id="syncfire_firebase_auth_domain" class="regular-text" value="<?php echo esc_attr(get_option('syncfire_firebase_auth_domain', '')); ?>" />
@@ -118,7 +123,7 @@ if (!defined('ABSPATH')) {
                                 </tr>
                                 <tr>
                                     <th scope="row">
-                                        <label for="syncfire_firebase_project_id"><?php _e('Project ID', 'sync-fire'); ?></label>
+                                        <label for="<?php echo SyncFire_Options::FIREBASE_PROJECT_ID; ?>"><?php _e('Project ID', 'sync-fire'); ?></label>
                                     </th>
                                     <td>
                                         <input type="text" name="syncfire_firebase_project_id" id="syncfire_firebase_project_id" class="regular-text" value="<?php echo esc_attr(get_option('syncfire_firebase_project_id', '')); ?>" />
@@ -127,37 +132,37 @@ if (!defined('ABSPATH')) {
                                 </tr>
                                 <tr>
                                     <th scope="row">
-                                        <label for="syncfire_firebase_storage_bucket"><?php _e('Storage Bucket', 'sync-fire'); ?></label>
+                                        <label for="<?php echo SyncFire_Options::FIREBASE_STORAGE_BUCKET; ?>"><?php _e('Storage Bucket', 'sync-fire'); ?></label>
                                     </th>
                                     <td>
-                                        <input type="text" name="syncfire_firebase_storage_bucket" id="syncfire_firebase_storage_bucket" class="regular-text" value="<?php echo esc_attr(get_option('syncfire_firebase_storage_bucket', '')); ?>" />
+                                        <input type="text" name="<?php echo SyncFire_Options::FIREBASE_STORAGE_BUCKET; ?>" id="<?php echo SyncFire_Options::FIREBASE_STORAGE_BUCKET; ?>" value="<?php echo esc_attr(syncfire_get_option(SyncFire_Options::FIREBASE_STORAGE_BUCKET, '')); ?>" class="regular-text" />
                                         <p class="description"><?php _e('Your Firebase Storage Bucket.', 'sync-fire'); ?></p>
                                     </td>
                                 </tr>
                                 <tr>
                                     <th scope="row">
-                                        <label for="syncfire_firebase_messaging_sender_id"><?php _e('Messaging Sender ID', 'sync-fire'); ?></label>
+                                        <label for="<?php echo SyncFire_Options::FIREBASE_MESSAGING_SENDER_ID; ?>"><?php _e('Messaging Sender ID', 'sync-fire'); ?></label>
                                     </th>
                                     <td>
-                                        <input type="text" name="syncfire_firebase_messaging_sender_id" id="syncfire_firebase_messaging_sender_id" class="regular-text" value="<?php echo esc_attr(get_option('syncfire_firebase_messaging_sender_id', '')); ?>" />
+                                        <input type="text" name="<?php echo SyncFire_Options::FIREBASE_MESSAGING_SENDER_ID; ?>" id="<?php echo SyncFire_Options::FIREBASE_MESSAGING_SENDER_ID; ?>" value="<?php echo esc_attr(syncfire_get_option(SyncFire_Options::FIREBASE_MESSAGING_SENDER_ID, '')); ?>" class="regular-text" />
                                         <p class="description"><?php _e('Your Firebase Messaging Sender ID.', 'sync-fire'); ?></p>
                                     </td>
                                 </tr>
                                 <tr>
                                     <th scope="row">
-                                        <label for="syncfire_firebase_app_id"><?php _e('App ID', 'sync-fire'); ?></label>
+                                        <label for="<?php echo SyncFire_Options::FIREBASE_APP_ID; ?>"><?php _e('App ID', 'sync-fire'); ?></label>
                                     </th>
                                     <td>
-                                        <input type="text" id="syncfire_firebase_app_id" name="syncfire_firebase_app_id" value="<?php echo esc_attr(get_option('syncfire_firebase_app_id', '')); ?>" class="regular-text" />
+                                        <input type="text" name="<?php echo SyncFire_Options::FIREBASE_APP_ID; ?>" id="<?php echo SyncFire_Options::FIREBASE_APP_ID; ?>" value="<?php echo esc_attr(syncfire_get_option(SyncFire_Options::FIREBASE_APP_ID, '')); ?>" class="regular-text" />
                                         <p class="description"><?php _e('Your Firebase App ID.', 'sync-fire'); ?></p>
                                     </td>
                                 </tr>
                                 <tr valign="top">
                     <th scope="row">
-                        <label for="syncfire_firebase_service_account"><?php _e('Service Account JSON', 'sync-fire'); ?></label>
+                        <label for="<?php echo SyncFire_Options::FIREBASE_SERVICE_ACCOUNT; ?>"><?php _e('Service Account JSON', 'sync-fire'); ?></label>
                     </th>
                     <td>
-                        <textarea id="syncfire_firebase_service_account" name="syncfire_firebase_service_account" class="large-text code" rows="10"><?php echo esc_textarea(get_option('syncfire_firebase_service_account', '')); ?></textarea>
+                        <textarea name="<?php echo SyncFire_Options::FIREBASE_SERVICE_ACCOUNT; ?>" id="<?php echo SyncFire_Options::FIREBASE_SERVICE_ACCOUNT; ?>" rows="10" cols="50" class="large-text code"><?php echo esc_textarea(syncfire_get_option(SyncFire_Options::FIREBASE_SERVICE_ACCOUNT, '')); ?></textarea>
                         <p class="description"><?php _e('Your Firebase Service Account JSON. This is used for secure server-to-server authentication with Firestore.', 'sync-fire'); ?></p>
                         <p class="description"><strong><?php _e('Important:', 'sync-fire'); ?></strong> <?php _e('This contains sensitive information. Make sure your wp-config.php file has proper security settings.', 'sync-fire'); ?></p>
                     </td>
@@ -180,13 +185,13 @@ if (!defined('ABSPATH')) {
                                     <td>
                                         <?php
                                         $taxonomies = get_taxonomies(array('public' => true), 'objects');
-                                        $selected_taxonomies = get_option('syncfire_taxonomies_to_sync', array());
+                                        $taxonomies_to_sync = syncfire_get_option(SyncFire_Options::TAXONOMIES_TO_SYNC, array());
 
                                         foreach ($taxonomies as $taxonomy) {
-                                            $checked = in_array($taxonomy->name, $selected_taxonomies) ? 'checked' : '';
+                                            $checked = in_array($taxonomy->name, $taxonomies_to_sync) ? 'checked' : '';
                                             ?>
                                             <label>
-                                                <input type="checkbox" name="syncfire_taxonomies_to_sync[]" value="<?php echo esc_attr($taxonomy->name); ?>" <?php echo $checked; ?> />
+                                                <input type="checkbox" name="<?php echo SyncFire_Options::TAXONOMIES_TO_SYNC; ?>[]" value="<?php echo esc_attr($taxonomy->name); ?>" <?php checked($checked); ?> />
                                                 <?php echo esc_html($taxonomy->labels->name); ?>
                                             </label><br>
                                             <?php
@@ -238,7 +243,7 @@ if (!defined('ABSPATH')) {
                                     <td>
                                         <?php
                                         $post_types = get_post_types(array('public' => true), 'objects');
-                                        $selected_post_types = get_option('syncfire_post_types_to_sync', array());
+                                        $post_types_to_sync = syncfire_get_option(SyncFire_Options::POST_TYPES_TO_SYNC, array());
                                         // Ensure $selected_post_types is always an array
                                         if (!is_array($selected_post_types)) {
                                             $selected_post_types = array();
@@ -250,10 +255,10 @@ if (!defined('ABSPATH')) {
                                                 continue;
                                             }
 
-                                            $checked = in_array($post_type->name, $selected_post_types) ? 'checked' : '';
+                                            $checked = in_array($post_type->name, $post_types_to_sync) ? 'checked' : '';
                                             ?>
                                             <label>
-                                                <input type="checkbox" name="syncfire_post_types_to_sync[]" value="<?php echo esc_attr($post_type->name); ?>" <?php echo $checked; ?> class="syncfire-post-type-checkbox" data-post-type="<?php echo esc_attr($post_type->name); ?>" />
+                                                <input type="checkbox" name="<?php echo SyncFire_Options::POST_TYPES_TO_SYNC; ?>[]" value="<?php echo esc_attr($post_type->name); ?>" <?php checked($checked); ?> class="syncfire-post-type-checkbox" data-post-type="<?php echo esc_attr($post_type->name); ?>" />
                                                 <?php echo esc_html($post_type->labels->name); ?>
                                             </label><br>
                                             <?php
@@ -266,21 +271,16 @@ if (!defined('ABSPATH')) {
 
                             <?php
                             // For each selected post type, show field selection and mapping
-                            $selected_post_types = get_option('syncfire_post_types_to_sync', array());
-                            // Ensure $selected_post_types is always an array
-                            if (!is_array($selected_post_types)) {
-                                $selected_post_types = array();
-                            }
-                            $post_type_fields = get_option('syncfire_post_type_fields', array());
+                            $post_type_fields = syncfire_get_option(SyncFire_Options::POST_TYPE_FIELDS, array());
                             if (!is_array($post_type_fields)) {
                                 $post_type_fields = array();
                             }
-                            $post_type_field_mapping = get_option('syncfire_post_type_field_mapping', array());
+                            $post_type_field_mapping = syncfire_get_option(SyncFire_Options::POST_TYPE_FIELD_MAPPING, array());
                             if (!is_array($post_type_field_mapping)) {
                                 $post_type_field_mapping = array();
                             }
 
-                            foreach ($selected_post_types as $post_type) {
+                            foreach ($post_types_to_sync as $post_type) {
                                 $post_type_obj = get_post_type_object($post_type);
 
                                 if (!$post_type_obj) {
@@ -367,7 +367,7 @@ if (!defined('ABSPATH')) {
                                             <tr>
                                                 <td><?php echo esc_html($field); ?></td>
                                                 <td>
-                                                    <input type="text" name="syncfire_post_type_field_mapping[<?php echo esc_attr($post_type); ?>][<?php echo esc_attr($field); ?>]" value="<?php echo esc_attr($firestore_field); ?>" class="regular-text" />
+                                                    <input type="text" name="<?php echo SyncFire_Options::POST_TYPE_FIELD_MAPPING; ?>[<?php echo esc_attr($post_type); ?>][<?php echo esc_attr($field); ?>]" value="<?php echo esc_attr($firestore_field); ?>" class="regular-text" />
                                                 </td>
                                             </tr>
                                             <?php
@@ -400,9 +400,9 @@ if (!defined('ABSPATH')) {
                         // 處理手動插入選項的要求
                         if (isset($_POST['syncfire_debug_insert']) && check_admin_referer('syncfire_debug_action', 'syncfire_debug_nonce')) {
                             // 插入測試選項
-                            update_option('syncfire_firebase_api_key', 'test_api_key_' . time());
-                            update_option('syncfire_firebase_auth_domain', 'test-project.firebaseapp.com');
-                            update_option('syncfire_firebase_project_id', 'test-project-' . time());
+                            syncfire_update_option(SyncFire_Options::FIREBASE_API_KEY, 'test_api_key_' . time());
+                            syncfire_update_option(SyncFire_Options::FIREBASE_AUTH_DOMAIN, 'test-project.firebaseapp.com');
+                            syncfire_update_option(SyncFire_Options::FIREBASE_PROJECT_ID, 'test-project-' . time());
 
                             echo '<div class="notice notice-success is-dismissible"><p>測試選項已插入。請刷新頁面查看結果。</p></div>';
                         }

@@ -9,6 +9,7 @@
      * Initialize the admin JavaScript
      */
     function init() {
+        console.log('SyncFire Init ...');
         // Test Firebase connection
         $('#syncfire-test-connection').on('click', function(e) {
             e.preventDefault();
@@ -51,14 +52,15 @@
      * Test the Firebase connection
      */
     function testFirebaseConnection() {
+        console.log('testFirebaseConnection')
         const data = {
             action: 'syncfire_test_firebase_connection',
-            nonce: syncfire_data.nonce
+            nonce: syncfire_ajax.nonce
         };
 
         showSyncStatus('Testing Firebase connection...', 'info');
 
-        $.post(syncfire_data.ajax_url, data, function(response) {
+        $.post(syncfire_ajax.ajax_url, data, function(response) {
             if (response.success) {
                 showSyncStatus(response.data.message, 'success');
             } else {
@@ -75,12 +77,12 @@
     function syncAll() {
         const data = {
             action: 'syncfire_resync_all',
-            nonce: syncfire_data.nonce
+            nonce: syncfire_ajax.nonce
         };
 
         showSyncStatus('Syncing all post types and taxonomies...', 'info');
 
-        $.post(syncfire_data.ajax_url, data, function(response) {
+        $.post(syncfire_ajax.ajax_url, data, function(response) {
             if (response.success) {
                 showSyncStatus(response.data.message, 'success');
             } else {
@@ -104,13 +106,13 @@
 
         const data = {
             action: 'syncfire_resync_taxonomy',
-            nonce: syncfire_data.nonce,
+            nonce: syncfire_ajax.nonce,
             taxonomy: taxonomy
         };
 
         showSyncStatus(`Syncing taxonomy ${taxonomy}...`, 'info');
 
-        $.post(syncfire_data.ajax_url, data, function(response) {
+        $.post(syncfire_ajax.ajax_url, data, function(response) {
             if (response.success) {
                 showSyncStatus(response.data.message, 'success');
             } else {
@@ -126,7 +128,7 @@
      */
     function togglePostTypeFields(postType, isChecked) {
         const fieldsContainer = $(`#syncfire-post-type-fields-${postType}`);
-        
+
         if (isChecked) {
             fieldsContainer.show();
         } else {
@@ -140,7 +142,7 @@
     function toggleFieldMapping(postType, field, isChecked) {
         const mappingTable = $(`#syncfire-field-mapping-${postType}`);
         const fieldRow = mappingTable.find(`tr:contains("${field}")`);
-        
+
         if (isChecked) {
             // If the row doesn't exist, add it
             if (fieldRow.length === 0) {
@@ -162,7 +164,7 @@
     function showSyncStatus(message, type) {
         const statusContainer = $('#syncfire-sync-status');
         let statusClass = '';
-        
+
         switch (type) {
             case 'success':
                 statusClass = 'notice-success';
@@ -175,7 +177,7 @@
                 statusClass = 'notice-info';
                 break;
         }
-        
+
         statusContainer.html(`<div class="notice ${statusClass} inline"><p>${message}</p></div>`);
     }
 

@@ -1,0 +1,9 @@
+{
+    "name": "syncfire/sync-fire-wp",
+    "description": "WordPress plugin that synchronizes specified taxonomies and post types with Google Firestore.",
+    "type": "wordpress-plugin",
+    "require": {
+        "google/cloud-firestore": "^1.40",
+        "guzzlehttp/guzzle": "^7.0"
+    }
+}

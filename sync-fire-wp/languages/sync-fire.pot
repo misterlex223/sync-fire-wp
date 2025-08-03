@@ -327,11 +327,11 @@ msgid "No taxonomy specified."
 msgstr ""
 
 #: includes/class-syncfire-admin.php:192
-msgid "Taxonomy %s has been successfully synced to Firestore."
+msgid "Taxonomy [%s] has been successfully synced to Firestore."
 msgstr ""
 
 #: includes/class-syncfire-admin.php:194
-msgid "There was an error syncing taxonomy %s to Firestore. Please check your settings and try again."
+msgid "There was an error syncing taxonomy [%s] to Firestore. Please check your settings and try again."
 msgstr ""
 
 #: includes/class-syncfire-admin.php:208

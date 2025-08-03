@@ -2,7 +2,10 @@ version: '3.8'
 
 services:
   wordpress:
-    image: wordpress:latest
+    # image: wordpress:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
     container_name: wp-dev
     env_file:
       - wordpress.env

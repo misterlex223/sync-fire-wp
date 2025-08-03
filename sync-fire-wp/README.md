@@ -64,6 +64,37 @@ The plugin automatically synchronizes changes to post types and taxonomies in re
 
 ## Firestore Data Structure
 
+## Technical Requirements
+
+### Firestore Connection Modes
+
+SyncFire supports two connection modes to Firestore:
+
+1. **gRPC Mode** (Recommended): Uses the gRPC protocol for optimal performance and efficiency when communicating with Firestore. This mode requires the PHP gRPC extension to be installed on your server.
+
+2. **REST Mode** (Fallback): Automatically used when the gRPC extension is not available. This mode uses standard HTTP REST calls to communicate with Firestore, providing wider compatibility at the cost of some performance.
+
+The plugin automatically detects which mode to use based on your server configuration - no manual setup required!
+
+### PHP Requirements
+
+- PHP 7.4 or higher
+- For gRPC Mode: PHP gRPC extension (`ext-grpc`)
+- Composer dependencies are included in the plugin
+
+### Installing gRPC Extension (Optional)
+
+To enable the more efficient gRPC mode:
+
+**For shared hosting:**
+Contact your hosting provider to request the gRPC extension installation.
+
+**For self-managed servers:**
+```bash
+pecl install grpc
+docker-php-ext-enable grpc  # For Docker environments
+```
+
 ### Taxonomies
 
 Taxonomies are stored in Firestore with the following structure:

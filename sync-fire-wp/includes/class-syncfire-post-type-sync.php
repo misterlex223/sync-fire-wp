@@ -45,7 +45,7 @@ class SyncFire_Post_Type_Sync {
      */
     public function sync_all_post_types() {
         // Get the post types to sync
-        $post_types_to_sync = get_option('syncfire_post_types_to_sync', array());
+        $post_types_to_sync = get_option(SyncFire_Options::POST_TYPES_TO_SYNC, array());
         
         if (empty($post_types_to_sync)) {
             return true; // No post types to sync
@@ -106,14 +106,14 @@ class SyncFire_Post_Type_Sync {
         $post_type = $post->post_type;
         
         // Check if this post type is configured for sync
-        $post_types_to_sync = get_option('syncfire_post_types_to_sync', array());
+        $post_types_to_sync = get_option(SyncFire_Options::POST_TYPES_TO_SYNC, array());
         
         if (!in_array($post_type, $post_types_to_sync)) {
             return true; // This post type is not configured for sync
         }
         
         // Get the fields to sync for this post type
-        $post_type_fields = get_option('syncfire_post_type_fields', array());
+        $post_type_fields = get_option(SyncFire_Options::POST_TYPE_FIELDS, array());
         $fields_to_sync = isset($post_type_fields[$post_type]) ? $post_type_fields[$post_type] : array();
         
         if (empty($fields_to_sync)) {
@@ -121,7 +121,7 @@ class SyncFire_Post_Type_Sync {
         }
         
         // Get the field mapping for this post type
-        $post_type_field_mapping = get_option('syncfire_post_type_field_mapping', array());
+        $post_type_field_mapping = get_option(SyncFire_Options::POST_TYPE_FIELD_MAPPING, array());
         $field_mapping = isset($post_type_field_mapping[$post_type]) ? $post_type_field_mapping[$post_type] : array();
         
         // Prepare the data for Firestore
@@ -151,7 +151,7 @@ class SyncFire_Post_Type_Sync {
         }
         
         // Check if this post type is configured for sync
-        $post_types_to_sync = get_option('syncfire_post_types_to_sync', array());
+        $post_types_to_sync = get_option(SyncFire_Options::POST_TYPES_TO_SYNC, array());
         
         if (!in_array($post->post_type, $post_types_to_sync)) {
             return; // This post type is not configured for sync
@@ -176,7 +176,7 @@ class SyncFire_Post_Type_Sync {
         }
         
         // Check if this post type is configured for sync
-        $post_types_to_sync = get_option('syncfire_post_types_to_sync', array());
+        $post_types_to_sync = get_option(SyncFire_Options::POST_TYPES_TO_SYNC, array());
         
         if (!in_array($post->post_type, $post_types_to_sync)) {
             return; // This post type is not configured for sync
@@ -196,7 +196,7 @@ class SyncFire_Post_Type_Sync {
      */
     public function post_status_changed($new_status, $old_status, $post) {
         // Check if this post type is configured for sync
-        $post_types_to_sync = get_option('syncfire_post_types_to_sync', array());
+        $post_types_to_sync = get_option(SyncFire_Options::POST_TYPES_TO_SYNC, array());
         
         if (!in_array($post->post_type, $post_types_to_sync)) {
             return; // This post type is not configured for sync
@@ -231,7 +231,7 @@ class SyncFire_Post_Type_Sync {
         }
         
         // Check if this post type is configured for sync
-        $post_types_to_sync = get_option('syncfire_post_types_to_sync', array());
+        $post_types_to_sync = get_option(SyncFire_Options::POST_TYPES_TO_SYNC, array());
         
         if (!in_array($post->post_type, $post_types_to_sync)) {
             return; // This post type is not configured for sync
@@ -243,7 +243,7 @@ class SyncFire_Post_Type_Sync {
         }
         
         // Get the fields to sync for this post type
-        $post_type_fields = get_option('syncfire_post_type_fields', array());
+        $post_type_fields = get_option(SyncFire_Options::POST_TYPE_FIELDS, array());
         $fields_to_sync = isset($post_type_fields[$post->post_type]) ? $post_type_fields[$post->post_type] : array();
         
         // Check if this meta key is in the fields to sync
@@ -271,7 +271,7 @@ class SyncFire_Post_Type_Sync {
         }
         
         // Check if this post type is configured for sync
-        $post_types_to_sync = get_option('syncfire_post_types_to_sync', array());
+        $post_types_to_sync = get_option(SyncFire_Options::POST_TYPES_TO_SYNC, array());
         
         if (!in_array($post->post_type, $post_types_to_sync)) {
             return; // This post type is not configured for sync
@@ -283,7 +283,7 @@ class SyncFire_Post_Type_Sync {
         }
         
         // Get the fields to sync for this post type
-        $post_type_fields = get_option('syncfire_post_type_fields', array());
+        $post_type_fields = get_option(SyncFire_Options::POST_TYPE_FIELDS, array());
         $fields_to_sync = isset($post_type_fields[$post->post_type]) ? $post_type_fields[$post->post_type] : array();
         
         // Check if featured image is in the fields to sync

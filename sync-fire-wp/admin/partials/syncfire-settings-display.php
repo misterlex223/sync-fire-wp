@@ -38,7 +38,7 @@ if (!class_exists('SyncFire_Options')) {
 
             <div class="tab-content">
                 <div class="syncfire-settings">
-                    <?php
+                    <!-- <?php
                     // 調試信息：檢查選項值是否存在
                     $api_key = syncfire_get_option(SyncFire_Options::FIREBASE_API_KEY, '');
                     $auth_domain = syncfire_get_option(SyncFire_Options::FIREBASE_AUTH_DOMAIN, '');
@@ -71,18 +71,10 @@ if (!class_exists('SyncFire_Options')) {
                     echo '<strong>用戶權限</strong><br>';
                     echo 'Can manage_options: ' . (current_user_can('manage_options') ? 'Yes' : 'No') . '<br>';
                     echo '</p></div>';
-                    ?>
-
-
-                    <!-- 顯示表單提交的目標 -->
-                    <div class="notice notice-info is-dismissible">
-                        <p><strong>表單提交信息</strong><br>
-                        表單將提交到: <?php echo admin_url('options.php'); ?><br>
-                        </p>
-                    </div>
+                    ?> -->
 
                     <form method="post" action="<?php echo admin_url('options.php'); ?>" class="syncfire-settings-form">
-                        <?php
+                        <!-- <?php
                         // 顯示設定欄位的隱藏輸入 - 使用常數定義的群組
                         settings_fields(SyncFire_Options::GROUP);
 
@@ -97,7 +89,7 @@ if (!class_exists('SyncFire_Options')) {
                         echo 'Action: ' . 'update' . '<br>';
                         echo 'Option page: ' . SyncFire_Options::GROUP . '<br>';
                         echo '</p></div>';
-                        ?>
+                        ?> -->
 
                         <div class="syncfire-settings-section">
                             <h3><?php _e('Firebase Configuration', 'sync-fire'); ?></h3>
@@ -174,7 +166,7 @@ if (!class_exists('SyncFire_Options')) {
                             <h3><?php _e('Taxonomy Synchronization', 'sync-fire'); ?></h3>
 
                             <?php
-                            settings_fields('syncfire_taxonomy_settings');
+                            settings_fields('syncfire_settings');
                             ?>
 
                             <table class="form-table">
@@ -191,7 +183,7 @@ if (!class_exists('SyncFire_Options')) {
                                             $checked = in_array($taxonomy->name, $taxonomies_to_sync) ? 'checked' : '';
                                             ?>
                                             <label>
-                                                <input type="checkbox" name="<?php echo SyncFire_Options::TAXONOMIES_TO_SYNC; ?>[]" value="<?php echo esc_attr($taxonomy->name); ?>" <?php checked($checked); ?> />
+                                                <input type="checkbox" name="<?php echo SyncFire_Options::TAXONOMIES_TO_SYNC; ?>[]" value="<?php echo esc_attr($taxonomy->name); ?>" <?php echo $checked; ?> />
                                                 <?php echo esc_html($taxonomy->labels->name); ?>
                                             </label><br>
                                             <?php
@@ -242,11 +234,15 @@ if (!class_exists('SyncFire_Options')) {
                                     </th>
                                     <td>
                                         <?php
-                                        $post_types = get_post_types(array('public' => true), 'objects');
+                                        // Get all public post types, including those created by ACF
+                                        $post_types = get_post_types(array('public' => true, '_builtin' => false), 'objects');
+                                        // Also include built-in post types like 'post' and 'page'
+                                        $builtin_post_types = get_post_types(array('public' => true, '_builtin' => true), 'objects');
+                                        $post_types = array_merge($post_types, $builtin_post_types);
                                         $post_types_to_sync = syncfire_get_option(SyncFire_Options::POST_TYPES_TO_SYNC, array());
-                                        // Ensure $selected_post_types is always an array
-                                        if (!is_array($selected_post_types)) {
-                                            $selected_post_types = array();
+                                        // Ensure $post_types_to_sync is always an array
+                                        if (!is_array($post_types_to_sync)) {
+                                            $post_types_to_sync = array();
                                         }
 
                                         foreach ($post_types as $post_type) {
@@ -258,7 +254,7 @@ if (!class_exists('SyncFire_Options')) {
                                             $checked = in_array($post_type->name, $post_types_to_sync) ? 'checked' : '';
                                             ?>
                                             <label>
-                                                <input type="checkbox" name="<?php echo SyncFire_Options::POST_TYPES_TO_SYNC; ?>[]" value="<?php echo esc_attr($post_type->name); ?>" <?php checked($checked); ?> class="syncfire-post-type-checkbox" data-post-type="<?php echo esc_attr($post_type->name); ?>" />
+                                                <input type="checkbox" name="<?php echo SyncFire_Options::POST_TYPES_TO_SYNC; ?>[]" value="<?php echo esc_attr($post_type->name); ?>" <?php echo $checked; ?> class="syncfire-post-type-checkbox" data-post-type="<?php echo esc_attr($post_type->name); ?>" />
                                                 <?php echo esc_html($post_type->labels->name); ?>
                                             </label><br>
                                             <?php

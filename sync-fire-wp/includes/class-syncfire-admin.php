@@ -48,7 +48,7 @@ class SyncFire_Admin {
     public function __construct( $plugin_name = 'sync-fire', $version = '1.0.0' ) {
         $this->plugin_name = $plugin_name;
         $this->version = $version;
-        
+
         // Add admin hooks
         $this->add_admin_hooks();
     }
@@ -67,13 +67,33 @@ class SyncFire_Admin {
      *
      * @since    1.0.0
      */
-    public function enqueue_scripts() {
-        wp_enqueue_script('syncfire-admin', plugin_dir_url(dirname(__FILE__)) . 'admin/js/syncfire-admin.js', array('jquery'), '1.0.0', true);
-        
+    public function enqueue_scripts($hook) {
+        // 添加調試日誌
+        error_log('SyncFire enqueue_scripts called on hook: ' . $hook);
+
+        // 放寬條件，在所有管理頁面上載入 JavaScript
+        // 這是臨時的，用於調試目的
+        // 之後可以根據實際的 hook 值再進行限制
+        // if (strpos($hook, 'syncfire') === false && $hook != 'toplevel_page_syncfire') {
+        //     return;
+        // }
+
+        error_log('SyncFire loading JS on page: ' . $hook);
+
+        wp_enqueue_script('syncfire-admin', plugin_dir_url(dirname(__FILE__)) . 'admin/js/syncfire-admin.js', array('jquery'), time(), true);
+
         // Add the AJAX URL and nonce to the script
         wp_localize_script('syncfire-admin', 'syncfire_ajax', array(
             'ajax_url' => admin_url('admin-ajax.php'),
             'nonce' => wp_create_nonce('syncfire_ajax_nonce'),
+            'page_hook' => $hook, // 添加頁面鉤子信息
+            'debug_info' => array(
+                'current_screen' => get_current_screen() ? get_current_screen()->id : 'unknown',
+                'is_admin' => is_admin() ? 'yes' : 'no',
+                'plugin_url' => plugin_dir_url(dirname(__FILE__)),
+                'admin_url' => admin_url(),
+                'time' => time()
+            ),
             'i18n' => array(
                 'syncing' => __('Syncing...', 'sync-fire'),
                 'sync_success' => __('Sync completed successfully!', 'sync-fire'),
@@ -83,6 +103,21 @@ class SyncFire_Admin {
                 'connection_error' => __('Connection failed. Please check your settings.', 'sync-fire')
             )
         ));
+
+        // 添加內聯調試腳本
+        wp_add_inline_script('syncfire-admin', '
+            console.log("SyncFire JS loaded on page: ' . $hook . '");
+            console.log("Debug info:", syncfire_ajax.debug_info);
+            jQuery(document).ready(function($) {
+                console.log("jQuery ready on page: ' . $hook . '");
+                // 檢查 Test Connection 按鈕是否存在
+                if ($("#syncfire-test-connection").length) {
+                    console.log("Test Connection button found");
+                } else {
+                    console.log("Test Connection button NOT found");
+                }
+            });
+        ', 'before');
     }
 
     /**
@@ -94,13 +129,13 @@ class SyncFire_Admin {
         // Enqueue admin scripts and styles
         add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_styles' ) );
         add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_scripts' ) );
-        
+
         // Add AJAX handlers
         add_action( 'wp_ajax_syncfire_resync_all', array( $this, 'resync_all' ) );
         add_action( 'wp_ajax_syncfire_resync_taxonomy', array( $this, 'resync_taxonomy' ) );
         add_action( 'wp_ajax_syncfire_test_firebase_connection', array( $this, 'test_firebase_connection' ) );
         add_action( 'wp_ajax_syncfire_clear_logs', array( $this, 'clear_logs' ) );
-        
+
         // Add admin menu
         add_action( 'admin_menu', array( $this, 'add_admin_menu' ) );
     }
@@ -121,7 +156,7 @@ class SyncFire_Admin {
             'dashicons-database-sync',
             100
         );
-        
+
         // Add the settings submenu page
         add_submenu_page(
             'syncfire',
@@ -131,7 +166,7 @@ class SyncFire_Admin {
             'syncfire-settings',
             array($this, 'display_settings_page')
         );
-        
+
         // Add the logs submenu page
         add_submenu_page(
             'syncfire',
@@ -141,7 +176,7 @@ class SyncFire_Admin {
             'syncfire-logs',
             array($this, 'display_logs_page')
         );
-        
+
         // Add the tests submenu page
         add_submenu_page(
             'syncfire',
@@ -165,18 +200,18 @@ class SyncFire_Admin {
         }
 
         // Verify nonce
-        if ( ! isset( $_POST['nonce'] ) || ! wp_verify_nonce( $_POST['nonce'], 'syncfire_nonce' ) ) {
+        if ( ! isset( $_POST['nonce'] ) || ! wp_verify_nonce( $_POST['nonce'], 'syncfire_ajax_nonce' ) ) {
             wp_send_json_error( array( 'message' => __( 'Security check failed.', 'sync-fire' ) ) );
         }
 
         // Get the post type sync instance
         $post_type_sync = new SyncFire_Post_Type_Sync();
         $taxonomy_sync = new SyncFire_Taxonomy_Sync();
-        
+
         // Perform the sync
         $post_type_result = $post_type_sync->sync_all_post_types();
         $taxonomy_result = $taxonomy_sync->sync_all_taxonomies();
-        
+
         if ( $post_type_result && $taxonomy_result ) {
             wp_send_json_success( array( 'message' => __( 'All post types and taxonomies have been successfully synced to Firestore.', 'sync-fire' ) ) );
         } else {
@@ -196,7 +231,7 @@ class SyncFire_Admin {
         }
 
         // Verify nonce
-        if ( ! isset( $_POST['nonce'] ) || ! wp_verify_nonce( $_POST['nonce'], 'syncfire_nonce' ) ) {
+        if ( ! isset( $_POST['nonce'] ) || ! wp_verify_nonce( $_POST['nonce'], 'syncfire_ajax_nonce' ) ) {
             wp_send_json_error( array( 'message' => __( 'Security check failed.', 'sync-fire' ) ) );
         }
 
@@ -206,17 +241,30 @@ class SyncFire_Admin {
         }
 
         $taxonomy = sanitize_text_field( $_POST['taxonomy'] );
-        
+        error_log('SyncFire Admin: Starting sync for taxonomy: ' . $taxonomy);
+
         // Get the taxonomy sync instance
         $taxonomy_sync = new SyncFire_Taxonomy_Sync();
-        
-        // Perform the sync
-        $result = $taxonomy_sync->sync_taxonomy( $taxonomy );
-        
-        if ( $result ) {
-            wp_send_json_success( array( 'message' => sprintf( __( 'Taxonomy %s has been successfully synced to Firestore.', 'sync-fire' ), $taxonomy ) ) );
+
+        // Debug: Get taxonomy data before sync
+        $taxonomy_obj = get_taxonomy($taxonomy);
+        if ($taxonomy_obj) {
+            error_log('SyncFire Admin: Taxonomy object exists: ' . json_encode($taxonomy_obj));
         } else {
-            wp_send_json_error( array( 'message' => sprintf( __( 'There was an error syncing taxonomy %s to Firestore. Please check your settings and try again.', 'sync-fire' ), $taxonomy ) ) );
+            error_log('SyncFire Admin: Taxonomy object not found for: ' . $taxonomy);
+        }
+
+        // Perform the sync
+        error_log('SyncFire Admin: Calling sync_taxonomy method for: ' . $taxonomy);
+        $result = $taxonomy_sync->sync_taxonomy( $taxonomy );
+        error_log('SyncFire Admin: sync_taxonomy result: ' . ($result ? 'true' : 'false'));
+
+        if ( $result ) {
+            error_log('SyncFire Admin: Sync successful for taxonomy: ' . $taxonomy);
+            wp_send_json_success( array( 'message' => sprintf( __( 'Taxonomy [%s] has been successfully synced to Firestore.', 'sync-fire' ), $taxonomy ) ) );
+        } else {
+            error_log('SyncFire Admin: Sync failed for taxonomy: ' . $taxonomy);
+            wp_send_json_error( array( 'message' => sprintf( __( 'There was an error syncing taxonomy [%s] to Firestore. Please check your settings and try again.', 'sync-fire' ), $taxonomy ) ) );
         }
     }
 
@@ -238,17 +286,17 @@ class SyncFire_Admin {
 
         // Get the Firestore instance
         $firestore = new SyncFire_Firestore();
-        
+
         // Test the connection
         $result = $firestore->test_connection();
-        
+
         if ( $result ) {
             wp_send_json_success( array( 'message' => __( 'Successfully connected to Firestore.', 'sync-fire' ) ) );
         } else {
             wp_send_json_error( array( 'message' => __( 'Failed to connect to Firestore. Please check your Firebase configuration settings.', 'sync-fire' ) ) );
         }
     }
-    
+
     /**
      * Re-sync a specific post type.
      *
@@ -259,37 +307,37 @@ class SyncFire_Admin {
         if (!current_user_can('manage_options')) {
             wp_send_json_error(__('You do not have sufficient permissions to perform this action.', 'sync-fire'));
         }
-        
+
         // Verify nonce
         if (!isset($_POST['nonce']) || !wp_verify_nonce($_POST['nonce'], 'syncfire_ajax_nonce')) {
             wp_send_json_error(__('Security check failed.', 'sync-fire'));
         }
-        
+
         // Get the post type
         if (!isset($_POST['post_type']) || empty($_POST['post_type'])) {
             wp_send_json_error(__('No post type specified.', 'sync-fire'));
         }
-        
+
         $post_type = sanitize_text_field($_POST['post_type']);
-        
+
         // Check if this post type is configured for sync
         $post_types_to_sync = get_option('syncfire_post_types_to_sync', array());
-        
+
         if (!in_array($post_type, $post_types_to_sync)) {
             wp_send_json_error(sprintf(__('Post type %s is not configured for synchronization.', 'sync-fire'), $post_type));
         }
-        
+
         // Sync the post type
         $post_type_sync = new SyncFire_Post_Type_Sync();
         $result = $post_type_sync->sync_post_type($post_type);
-        
+
         if ($result) {
             wp_send_json_success(sprintf(__('Post type %s has been successfully synced to Firestore.', 'sync-fire'), $post_type));
         } else {
             wp_send_json_error(sprintf(__('There was an error syncing post type %s to Firestore. Please check your settings and try again.', 'sync-fire'), $post_type));
         }
     }
-    
+
     /**
      * Display the admin page.
      *
@@ -298,7 +346,7 @@ class SyncFire_Admin {
     public function display_admin_page() {
         require_once plugin_dir_path( dirname( __FILE__ ) ) . 'admin/partials/syncfire-admin-display.php';
     }
-    
+
     /**
      * Display the settings page.
      *
@@ -307,7 +355,7 @@ class SyncFire_Admin {
     public function display_settings_page() {
         require_once plugin_dir_path( dirname( __FILE__ ) ) . 'admin/partials/syncfire-settings-display.php';
     }
-    
+
     /**
      * Display the logs page.
      *
@@ -316,7 +364,7 @@ class SyncFire_Admin {
     public function display_logs_page() {
         require_once plugin_dir_path( dirname( __FILE__ ) ) . 'admin/partials/syncfire-logs-display.php';
     }
-    
+
     /**
      * Display the tests page.
      *
@@ -325,7 +373,7 @@ class SyncFire_Admin {
     public function display_tests_page() {
         require_once plugin_dir_path( dirname( __FILE__ ) ) . 'admin/partials/syncfire-tests-display.php';
     }
-    
+
     /**
      * Clear logs.
      *
@@ -336,17 +384,17 @@ class SyncFire_Admin {
         if ( ! current_user_can( 'manage_options' ) ) {
             wp_die( __( 'You do not have sufficient permissions to perform this action.', 'sync-fire' ) );
         }
-        
+
         // Verify nonce
         check_admin_referer( 'syncfire_clear_logs' );
-        
+
         // Clear logs
         $logger = new SyncFire_Logger();
         $logger->clear_logs();
-        
+
         // Add notice
         $logger->add_admin_notice( __( 'Logs cleared successfully.', 'sync-fire' ), SyncFire_Logger::LOG_LEVEL_SUCCESS );
-        
+
         // Redirect back to logs page
         wp_redirect( admin_url( 'admin.php?page=syncfire-logs' ) );
         exit;

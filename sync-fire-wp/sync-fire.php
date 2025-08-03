@@ -85,6 +85,7 @@ class SyncFire {
         require_once plugin_dir_path( __FILE__ ) . 'includes/syncfire-functions.php';
         require_once plugin_dir_path( __FILE__ ) . 'includes/class-syncfire-settings-test.php';
         require_once plugin_dir_path( __FILE__ ) . 'includes/class-syncfire-migration.php';
+        require_once SYNCFIRE_PLUGIN_DIR . 'includes/class-syncfire-hooks.php';
     }
 
     /**
@@ -94,8 +95,10 @@ class SyncFire {
      * @return void
      */
     private function init_hooks() {
-        // Admin hooks
-        add_action('admin_menu', array($this, 'add_admin_menu'));
+        // 初始化 SyncFire_Hooks 類，這將處理所有 admin JS/CSS 和 AJAX 請求
+        new SyncFire_Hooks();
+        
+        // Admin hooks - only register settings, menu is handled by SyncFire_Admin class
         add_action('admin_init', array($this, 'register_settings'));
 
         // 清除快取並重新註冊設定

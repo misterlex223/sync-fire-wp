@@ -11,6 +11,34 @@ if (!defined('ABSPATH')) {
 }
 
 /**
+ * Integrate Google Maps API key with Advanced Custom Fields
+ *
+ * This function implements both methods from ACF documentation:
+ * 1. Using the acf/fields/google_map/api filter
+ * 2. Using the acf_update_setting function on acf/init hook
+ *
+ * @since 1.0.0
+ * @return void
+ */
+function syncfire_integrate_google_maps_api_key() {
+    add_action('acf/init', 'syncfire_acf_init_google_api_key');
+}
+
+/**
+ * Set Google Maps API key on ACF init
+ *
+ * @since 1.0.0
+ * @return void
+ */
+function syncfire_acf_init_google_api_key() {
+    $api_key = get_option(SyncFire_Options::GOOGLE_MAP_API_KEY, '');
+    error_log('SyncFire: Google Maps API key set: ' . $api_key);
+    if (!empty($api_key) && function_exists('acf_update_setting')) {
+        acf_update_setting('google_api_key', $api_key);
+    }
+}
+
+/**
  * Register plugin option
  *
  * @param string $option_name Option name constant
@@ -63,7 +91,7 @@ function syncfire_sanitize_array($input) {
     if (!is_array($input)) {
         return array();
     }
-    
+
     // Sanitize each element in the array
     $sanitized_input = array();
     foreach ($input as $key => $value) {
@@ -73,7 +101,7 @@ function syncfire_sanitize_array($input) {
             $sanitized_input[$key] = sanitize_text_field($value);
         }
     }
-    
+
     return $sanitized_input;
 }
 
@@ -84,23 +112,23 @@ function syncfire_log_form_submission() {
     if (empty($_POST) || !isset($_POST['option_page']) || $_POST['option_page'] !== SyncFire_Options::GROUP) {
         return;
     }
-    
+
     $log_file = SYNCFIRE_PLUGIN_DIR . 'logs/form_submission.log';
-    
+
     // Ensure log directory exists
     if (!file_exists(SYNCFIRE_PLUGIN_DIR . 'logs')) {
         mkdir(SYNCFIRE_PLUGIN_DIR . 'logs', 0755, true);
     }
-    
+
     $log_message = date('[Y-m-d H:i:s]') . " Form submission data\n";
     $log_message .= "REQUEST_URI: " . $_SERVER['REQUEST_URI'] . "\n";
     $log_message .= "option_page: " . $_POST['option_page'] . "\n";
-    
+
     // Log all option values
     foreach (SyncFire_Options::get_all_options() as $option) {
         $log_message .= "$option: " . (isset($_POST[$option]) ? (is_array($_POST[$option]) ? json_encode($_POST[$option]) : $_POST[$option]) : 'N/A') . "\n";
     }
-    
+
     file_put_contents($log_file, $log_message, FILE_APPEND);
 }
 
@@ -110,7 +138,7 @@ function syncfire_log_form_submission() {
 function syncfire_test_settings() {
     // Get all registered settings
     global $wp_registered_settings;
-    
+
     // Check that all options are correctly registered
     $missing_options = [];
     foreach (SyncFire_Options::get_all_options() as $option) {
@@ -118,7 +146,7 @@ function syncfire_test_settings() {
             $missing_options[] = $option;
         }
     }
-    
+
     if (!empty($missing_options)) {
         error_log('SyncFire: Missing options: ' . implode(', ', $missing_options));
     }

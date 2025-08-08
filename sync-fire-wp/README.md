@@ -117,7 +117,7 @@ Taxonomies are stored in Firestore with the following structure:
 Post types are stored in Firestore with the following structure:
 
 ```
-/post_types/{post_type}/posts/{post_id}
+/posts/{post_type}/items/{post_id}
   - [selected fields based on configuration]
 ```
 

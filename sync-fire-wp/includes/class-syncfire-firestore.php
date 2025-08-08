@@ -92,7 +92,7 @@ class SyncFire_Firestore {
      * @var      FirestoreClient    $firestore    The Firebase Firestore client instance.
      */
     private $firestore;
-    
+
     /**
      * Flag to indicate if we're using the REST fallback client.
      *
@@ -101,7 +101,7 @@ class SyncFire_Firestore {
      * @var      boolean    $using_rest_fallback    True if using REST fallback, false if using native gRPC client.
      */
     private $using_rest_fallback = false;
-    
+
     /**
      * The REST client for Firestore API.
      *
@@ -110,7 +110,7 @@ class SyncFire_Firestore {
      * @var      GuzzleClient    $rest_client    The REST client for Firestore API.
      */
     private $rest_client;
-    
+
     /**
      * The access token for Firestore REST API.
      *
@@ -119,7 +119,7 @@ class SyncFire_Firestore {
      * @var      string    $access_token    The access token for Firestore REST API.
      */
     private $access_token;
-    
+
     /**
      * The Firestore REST API base URL.
      *
@@ -244,38 +244,38 @@ class SyncFire_Firestore {
 
             // Initialize Firestore with the service account
             error_log('SyncFire: Initializing Firestore with service account: ' . $service_account_file);
-            
+
             // Check if gRPC extension is available
             if (extension_loaded('grpc')) {
                 error_log('SyncFire: gRPC extension available, using native Firestore client');
-                
+
                 // Configure the Firestore client options
                 $options = [
                     'projectId' => $this->project_id,
                     'keyFilePath' => $service_account_file
                 ];
-                
+
                 error_log('SyncFire: Creating native Firestore client with options: ' . json_encode($options));
-                
+
                 // Create the Firestore client directly using Google's API with gRPC
                 $this->firestore = new FirestoreClient($options);
                 $this->using_rest_fallback = false;
-                
+
                 error_log('SyncFire: Native Firestore client initialized successfully');
             } else {
                 // gRPC not available, use REST fallback
                 error_log('SyncFire: gRPC extension not available, using REST fallback for Firestore');
-                
+
                 // Load the service account data for authentication
                 $service_account_data = json_decode(file_get_contents($service_account_file), true);
-                
+
                 // Initialize REST client wrapper
                 $this->init_rest_client($service_account_data);
                 $this->using_rest_fallback = true;
-                
+
                 error_log('SyncFire: REST fallback client initialized successfully');
             }
-            
+
             return true;
         } catch (GoogleException $e) {
             error_log('SyncFire: Failed to initialize Firestore: ' . $e->getMessage());
@@ -312,7 +312,7 @@ class SyncFire_Firestore {
                 // Make a simple request to Firestore to test the connection
                 // We'll just list the collections to verify connectivity
                 $collections = $this->firestore->collections();
-                
+
                 // If we get here, the connection was successful
                 return true;
             }
@@ -321,7 +321,7 @@ class SyncFire_Firestore {
             return false;
         }
     }
-    
+
     /**
      * Test the REST connection to Firestore.
      *
@@ -335,18 +335,18 @@ class SyncFire_Firestore {
                 error_log('SyncFire: REST client not initialized');
                 return false;
             }
-            
+
             // Make a simple request to get project info
             // Using a different endpoint that should always exist
             $url = "v1/projects/{$this->project_id}/databases/(default)";
-            
+
             $response = $this->rest_client->get($url, [
                 'headers' => [
                     'Authorization' => 'Bearer ' . $this->access_token,
                     'Content-Type' => 'application/json'
                 ]
             ]);
-            
+
             // Check response
             if ($response->getStatusCode() >= 200 && $response->getStatusCode() < 300) {
                 error_log('SyncFire: Successfully connected to Firestore via REST');
@@ -365,7 +365,7 @@ class SyncFire_Firestore {
                         'Content-Type' => 'application/json'
                     ]
                 ]);
-                
+
                 if ($response->getStatusCode() >= 200 && $response->getStatusCode() < 300) {
                     error_log('SyncFire: Successfully connected to Firestore API via REST');
                     return true;
@@ -373,7 +373,7 @@ class SyncFire_Firestore {
             } catch (\Exception $innerEx) {
                 error_log('SyncFire: Failed to connect to Firestore API via REST: ' . $innerEx->getMessage());
             }
-            
+
             error_log('SyncFire: Failed to connect to Firestore via REST: ' . $e->getMessage());
             return false;
         } catch (\Exception $e) {
@@ -438,7 +438,7 @@ class SyncFire_Firestore {
             }
 
             // Create the document path
-            $document_path = "posts/{$post_type}/{$post_id}";
+            $document_path = "posts/{$post_type}/items/{$post_id}";
 
             if ($this->using_rest_fallback) {
                 // Use REST API
@@ -474,7 +474,7 @@ class SyncFire_Firestore {
             }
 
             // Create the document path
-            $document_path = "posts/{$post_type}/{$post_id}";
+            $document_path = "posts/{$post_type}/items/{$post_id}";
 
             if ($this->using_rest_fallback) {
                 // Use REST API
@@ -545,12 +545,12 @@ class SyncFire_Firestore {
                 // Use native Firestore client
                 $document_ref = $this->firestore->document($document_path);
                 $snapshot = $document_ref->snapshot();
-                
+
                 // Check if the document exists
                 if (!$snapshot->exists()) {
                     return [];
                 }
-                
+
                 // Return the document data
                 return $snapshot->data();
             }
@@ -684,10 +684,10 @@ class SyncFire_Firestore {
         try {
             // Set up the Firestore REST API URL
             $this->firestore_api_url = "https://firestore.googleapis.com/v1/projects/{$this->project_id}/databases/(default)/documents";
-            
+
             // Generate an access token from service account
             $this->access_token = $this->generate_access_token($service_account_data);
-            
+
             // Initialize the REST client
             $this->rest_client = new GuzzleClient([
                 'base_uri' => 'https://firestore.googleapis.com/',
@@ -697,14 +697,14 @@ class SyncFire_Firestore {
                     'Accept' => 'application/json'
                 ]
             ]);
-            
+
             return true;
         } catch (\Exception $e) {
             error_log('SyncFire: Failed to initialize REST client: ' . $e->getMessage());
             return false;
         }
     }
-    
+
     /**
      * Generate an access token from service account credentials.
      *
@@ -715,11 +715,11 @@ class SyncFire_Firestore {
     private function generate_access_token($service_account_data) {
         // Check if we have a cached token that's still valid
         $token_data = get_transient('syncfire_firebase_token');
-        
+
         if ($token_data) {
             return $token_data['access_token'];
         }
-        
+
         // No valid cached token, get a new one
         try {
             // Create JWT header
@@ -728,7 +728,7 @@ class SyncFire_Firestore {
                 'typ' => 'JWT',
                 'kid' => $service_account_data['private_key_id']
             ];
-            
+
             // Create JWT claim set
             $now = time();
             $claim_set = [
@@ -738,28 +738,28 @@ class SyncFire_Firestore {
                 'exp' => $now + 3600,
                 'iat' => $now
             ];
-            
+
             // Encode JWT header and claim set
             $base64_header = rtrim(strtr(base64_encode(json_encode($header)), '+/', '-_'), '=');
             $base64_claim_set = rtrim(strtr(base64_encode(json_encode($claim_set)), '+/', '-_'), '=');
-            
+
             // Create signature
             $signature_input = $base64_header . '.' . $base64_claim_set;
             $private_key = openssl_pkey_get_private($service_account_data['private_key']);
-            
+
             if (!$private_key) {
                 throw new \Exception('Invalid private key: ' . openssl_error_string());
             }
-            
+
             $signature = '';
             openssl_sign($signature_input, $signature, $private_key, OPENSSL_ALGO_SHA256);
             openssl_free_key($private_key);
-            
+
             $base64_signature = rtrim(strtr(base64_encode($signature), '+/', '-_'), '=');
-            
+
             // Create JWT
             $jwt = $base64_header . '.' . $base64_claim_set . '.' . $base64_signature;
-            
+
             // Exchange JWT for access token
             $client = new GuzzleClient();
             $response = $client->post('https://oauth2.googleapis.com/token', [
@@ -768,19 +768,19 @@ class SyncFire_Firestore {
                     'assertion' => $jwt
                 ]
             ]);
-            
+
             $token_data = json_decode($response->getBody(), true);
-            
+
             // Cache the token (for slightly less than its expiration time)
             set_transient('syncfire_firebase_token', $token_data, $token_data['expires_in'] - 300);
-            
+
             return $token_data['access_token'];
         } catch (\Exception $e) {
             error_log('SyncFire: Failed to generate access token: ' . $e->getMessage());
             return false;
         }
     }
-    
+
     /**
      * Save a document to Firestore using REST API.
      *
@@ -797,17 +797,17 @@ class SyncFire_Firestore {
                 error_log('SyncFire: REST client not initialized');
                 return false;
             }
-            
+
             // Format data for Firestore REST API
             $firestore_data = $this->format_data_for_rest($data);
-            
+
             // Create the request URL
             $base_url = "v1/projects/{$this->project_id}/databases/(default)/documents";
-            
+
             // Check if we're dealing with a taxonomy (they need special handling)
             $is_taxonomy = strpos($document_path, 'taxonomies/') === 0;
             error_log('SyncFire: Is taxonomy document: ' . ($is_taxonomy ? 'yes' : 'no'));
-            
+
             // For taxonomies, we need to use a different approach - create the document with POST first
             if ($is_taxonomy) {
                 // Extract collection and document ID
@@ -815,32 +815,32 @@ class SyncFire_Firestore {
                 if (count($parts) >= 2) {
                     $collection = $parts[0];
                     $document_id = $parts[1];
-                    
+
                     // First check if the document exists
                     try {
                         $check_url = "{$base_url}/{$document_path}";
                         error_log('SyncFire: Checking if document exists: ' . $check_url);
-                        
+
                         $check_response = $this->rest_client->get($check_url, [
                             'headers' => [
                                 'Authorization' => 'Bearer ' . $this->access_token
                             ],
                             'http_errors' => false
                         ]);
-                        
+
                         $document_exists = $check_response->getStatusCode() === 200;
                         error_log('SyncFire: Document exists: ' . ($document_exists ? 'yes' : 'no'));
-                        
+
                         if (!$document_exists) {
                             // Document doesn't exist, create it with POST
                             $create_url = "{$base_url}/{$collection}?documentId={$document_id}";
                             error_log('SyncFire: Creating document with POST: ' . $create_url);
-                            
+
                             // Prepare the JSON payload with special handling for empty objects
                             $json_payload = json_encode(['fields' => $firestore_data]);
                             // Replace empty arrays [] with empty objects {} in the JSON string
                             $json_payload = str_replace('"fields":[]', '"fields":{}', $json_payload);
-                            
+
                             $create_response = $this->rest_client->post($create_url, [
                                 'body' => $json_payload,
                                 'headers' => [
@@ -849,7 +849,7 @@ class SyncFire_Firestore {
                                 ],
                                 'http_errors' => false
                             ]);
-                            
+
                             if ($create_response->getStatusCode() >= 200 && $create_response->getStatusCode() < 300) {
                                 error_log('SyncFire: Successfully created document via POST');
                                 return true;
@@ -872,12 +872,12 @@ class SyncFire_Firestore {
                                 }
                             }
                             error_log('SyncFire: Updating document with PATCH: ' . $update_url);
-                            
+
                             // Prepare the JSON payload with special handling for empty objects
                             $json_payload = json_encode(['fields' => $firestore_data]);
                             // Replace empty arrays [] with empty objects {} in the JSON string
                             $json_payload = str_replace('"fields":[]', '"fields":{}', $json_payload);
-                            
+
                             $update_response = $this->rest_client->patch($update_url, [
                                 'body' => $json_payload,
                                 'headers' => [
@@ -886,7 +886,7 @@ class SyncFire_Firestore {
                                 ],
                                 'http_errors' => false
                             ]);
-                            
+
                             if ($update_response->getStatusCode() >= 200 && $update_response->getStatusCode() < 300) {
                                 error_log('SyncFire: Successfully updated document via PATCH');
                                 return true;
@@ -900,46 +900,59 @@ class SyncFire_Firestore {
                     }
                 }
             }
-            
+
             // Standard approach for non-taxonomy documents or if taxonomy-specific approach failed
-            $url = "{$base_url}/{$document_path}";
-            
-            // Add merge parameter if needed
-            if ($merge) {
-                $url .= '?updateMask.fieldPaths=*';
+            // Check if document_path already contains the full path or just the relative path
+            if (strpos($document_path, 'projects/') === 0) {
+                // Already a full path
+                $url = "v1/{$document_path}";
+            } else {
+                // Relative path, construct the full URL
+                $url = "{$base_url}/{$document_path}";
             }
-            
+
+            // We'll handle merge through updateMask.fieldPaths in the query_params section below
+            // Don't add a wildcard updateMask here as it's not supported by the REST API
+
             // Log the request data for debugging
             error_log('SyncFire: Saving document to path: ' . $url);
             // Log the raw PHP data structure for debugging
             error_log('SyncFire: Document data (raw): ' . print_r($firestore_data, true));
             error_log('SyncFire: Document data (JSON): ' . json_encode($firestore_data, JSON_PARTIAL_OUTPUT_ON_ERROR));
-            
+
             // For taxonomies and new documents, try PUT first
             $method = $is_taxonomy ? 'put' : 'patch';
-            
+
             // Handle updateMask for PATCH requests
             $query_params = [];
-            if ($method === 'patch' && $merge) {
-                // Get top-level field names from the data
-                $field_paths = array_keys($firestore_data);
-                if (!empty($field_paths)) {
-                    foreach ($field_paths as $field) {
-                        $query_params[] = 'updateMask.fieldPaths=' . urlencode($field);
+            if ($method === 'patch') {
+                if ($merge) {
+                    // For merge operations, explicitly list all fields to update
+                    // Get top-level field names from the data
+                    $field_paths = array_keys($firestore_data);
+                    if (!empty($field_paths)) {
+                        foreach ($field_paths as $field) {
+                            $query_params[] = 'updateMask.fieldPaths=' . urlencode($field);
+                        }
                     }
                 }
             }
-            
+
             // Add query parameters to URL if needed
             if (!empty($query_params)) {
-                $url .= '?' . implode('&', $query_params);
+                // Check if URL already has a query string (contains '?')
+                if (strpos($url, '?') !== false) {
+                    $url .= '&' . implode('&', $query_params);
+                } else {
+                    $url .= '?' . implode('&', $query_params);
+                }
             }
-            
+
             // Prepare the JSON payload with special handling for empty objects
             $json_payload = json_encode(['fields' => $firestore_data]);
             // Replace empty arrays [] with empty objects {} in the JSON string
             $json_payload = str_replace('"fields":[]', '"fields":{}', $json_payload);
-            
+
             $options = [
                 'body' => $json_payload,
                 'headers' => [
@@ -948,12 +961,12 @@ class SyncFire_Firestore {
                 ],
                 'http_errors' => false
             ];
-            
+
             try {
                 // Make the request
                 error_log('SyncFire: Trying ' . strtoupper($method) . ' request to: ' . $url);
                 $response = $this->rest_client->$method($url, $options);
-                
+
                 // Check response
                 if ($response->getStatusCode() >= 200 && $response->getStatusCode() < 300) {
                     error_log('SyncFire: Successfully saved document via REST ' . strtoupper($method) . ' to: ' . $url);
@@ -962,13 +975,13 @@ class SyncFire_Firestore {
                     error_log('SyncFire: Failed to save document via REST ' . strtoupper($method) . ': ' . $response->getStatusCode());
                     error_log('SyncFire: Response body: ' . $response->getBody());
                 }
-                
+
                 // If first method fails, try the alternative method
                 $alt_method = $method === 'patch' ? 'put' : 'patch';
                 error_log('SyncFire: Trying ' . strtoupper($alt_method) . ' for document operation');
-                
+
                 $response = $this->rest_client->$alt_method($url, $options);
-                
+
                 if ($response->getStatusCode() >= 200 && $response->getStatusCode() < 300) {
                     error_log('SyncFire: Successfully saved document via REST ' . strtoupper($alt_method));
                     return true;
@@ -985,10 +998,10 @@ class SyncFire_Firestore {
             error_log('SyncFire: Failed to save document via REST: ' . $e->getMessage());
             return false;
         }
-        
+
         return false;
     }
-    
+
     /**
      * Format data for Firestore REST API.
      *
@@ -998,14 +1011,14 @@ class SyncFire_Firestore {
      */
     private function format_data_for_rest($data) {
         $formatted = [];
-        
+
         foreach ($data as $key => $value) {
             $formatted[$key] = $this->format_value_for_rest($value, $key);
         }
-        
+
         return $formatted;
     }
-    
+
     /**
      * Format a value for Firestore REST API.
      *
@@ -1034,7 +1047,7 @@ class SyncFire_Firestore {
                 }
                 // If map is empty, ensure it's an empty object, not an empty array
                 if (empty($map) && $field_name === 'meta') {
-                    return ['mapValue' => ['fields' => (object)[]]]; 
+                    return ['mapValue' => ['fields' => (object)[]]];
                 }
                 return ['mapValue' => ['fields' => $map]];
             } else {
@@ -1063,7 +1076,7 @@ class SyncFire_Firestore {
             return ['stringValue' => (string) $value];
         }
     }
-    
+
     /**
      * Delete a document from Firestore using REST API.
      *
@@ -1078,10 +1091,10 @@ class SyncFire_Firestore {
                 error_log('SyncFire: REST client not initialized');
                 return false;
             }
-            
+
             // Create the request URL
             $url = "v1/projects/{$this->project_id}/databases/(default)/documents/{$document_path}";
-            
+
             // Make the request
             $response = $this->rest_client->delete($url, [
                 'headers' => [
@@ -1089,7 +1102,7 @@ class SyncFire_Firestore {
                     'Content-Type' => 'application/json'
                 ]
             ]);
-            
+
             // Check response
             if ($response->getStatusCode() >= 200 && $response->getStatusCode() < 300) {
                 return true;
@@ -1105,7 +1118,7 @@ class SyncFire_Firestore {
             return false;
         }
     }
-    
+
     /**
      * Get a document from Firestore using REST API.
      *
@@ -1120,10 +1133,10 @@ class SyncFire_Firestore {
                 error_log('SyncFire: REST client not initialized');
                 return [];
             }
-            
+
             // Create the request URL
             $url = "v1/projects/{$this->project_id}/databases/(default)/documents/{$document_path}";
-            
+
             // Make the request
             $response = $this->rest_client->get($url, [
                 'headers' => [
@@ -1131,16 +1144,16 @@ class SyncFire_Firestore {
                     'Content-Type' => 'application/json'
                 ]
             ]);
-            
+
             // Check response
             if ($response->getStatusCode() >= 200 && $response->getStatusCode() < 300) {
                 $data = json_decode($response->getBody(), true);
-                
+
                 // Convert Firestore REST format to standard PHP array
                 if (isset($data['fields'])) {
                     return $this->parse_rest_document($data['fields']);
                 }
-                
+
                 return [];
             } else {
                 error_log('SyncFire: Failed to get document via REST: ' . $response->getStatusCode());
@@ -1151,7 +1164,7 @@ class SyncFire_Firestore {
             if ($e->getCode() == 404) {
                 return [];
             }
-            
+
             error_log('SyncFire: Failed to get document via REST: ' . $e->getMessage());
             return [];
         } catch (\Exception $e) {
@@ -1159,7 +1172,7 @@ class SyncFire_Firestore {
             return [];
         }
     }
-    
+
     /**
      * Parse a Firestore REST document into a standard PHP array.
      *
@@ -1169,14 +1182,14 @@ class SyncFire_Firestore {
      */
     private function parse_rest_document($fields) {
         $result = [];
-        
+
         foreach ($fields as $key => $value) {
             $result[$key] = $this->parse_rest_value($value);
         }
-        
+
         return $result;
     }
-    
+
     /**
      * Parse a Firestore REST value into a standard PHP value.
      *

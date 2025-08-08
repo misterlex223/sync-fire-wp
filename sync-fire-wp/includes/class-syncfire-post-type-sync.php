@@ -339,9 +339,15 @@ class SyncFire_Post_Type_Sync {
             return get_post_meta($post->ID, $meta_key, true);
         }
         
-        // Check if the field is a taxonomy
-        if (strpos($field, 'tax_') === 0) {
-            $taxonomy = substr($field, 4);
+        // Check if the field is an ACF field
+        if (strpos($field, 'acf_') === 0 && function_exists('get_field')) {
+            $acf_key = substr($field, 4);
+            return get_field($acf_key, $post->ID);
+        }
+        
+        // Check if the field is a taxonomy (supports both tax_ and taxonomy_ prefixes)
+        if (strpos($field, 'tax_') === 0 || strpos($field, 'taxonomy_') === 0) {
+            $taxonomy = strpos($field, 'tax_') === 0 ? substr($field, 4) : substr($field, 9);
             $terms = get_the_terms($post->ID, $taxonomy);
             
             if (is_wp_error($terms) || empty($terms)) {

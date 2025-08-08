@@ -11,13 +11,13 @@ if (!defined('ABSPATH')) {
 
 /**
  * SyncFire Plugin Options Constants Class
- * 
+ *
  * @since      1.0.0
  */
 class SyncFire_Options {
     // Options group
     const GROUP = 'syncfire_settings';
-    
+    const SYNC_SETTINGS = 'syncfire_sync_settings';
     // Firebase settings
     const FIREBASE_API_KEY = 'syncfire_firebase_api_key';
     const FIREBASE_AUTH_DOMAIN = 'syncfire_firebase_auth_domain';
@@ -26,17 +26,20 @@ class SyncFire_Options {
     const FIREBASE_MESSAGING_SENDER_ID = 'syncfire_firebase_messaging_sender_id';
     const FIREBASE_APP_ID = 'syncfire_firebase_app_id';
     const FIREBASE_SERVICE_ACCOUNT = 'syncfire_firebase_service_account';
-    
+
+    // Google MAP API settings
+    const GOOGLE_MAP_API_KEY = 'syncfire_google_maps_api_key';
+
     // Taxonomy sync settings
     const TAXONOMIES_TO_SYNC = 'syncfire_taxonomies_to_sync';
     const TAXONOMY_ORDER_FIELD = 'syncfire_taxonomy_order_field';
     const TAXONOMY_SORT_ORDER = 'syncfire_taxonomy_sort_order';
-    
+
     // Post type sync settings
     const POST_TYPES_TO_SYNC = 'syncfire_post_types_to_sync';
     const POST_TYPE_FIELDS = 'syncfire_post_type_fields';
     const POST_TYPE_FIELD_MAPPING = 'syncfire_post_type_field_mapping';
-    
+
     // Migration tracking
     const MIGRATION_COMPLETE = 'syncfire_migration_complete';
 
@@ -62,7 +65,7 @@ class SyncFire_Options {
             self::POST_TYPE_FIELD_MAPPING,
         ];
     }
-    
+
     /**
      * Get an array of all array-type options
      *

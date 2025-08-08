@@ -97,9 +97,12 @@ class SyncFire {
     private function init_hooks() {
         // 初始化 SyncFire_Hooks 類，這將處理所有 admin JS/CSS 和 AJAX 請求
         new SyncFire_Hooks();
-        
+
         // Admin hooks - only register settings, menu is handled by SyncFire_Admin class
         add_action('admin_init', array($this, 'register_settings'));
+
+        // Initialize Google Maps API key integration with ACF
+        syncfire_integrate_google_maps_api_key();
 
         // 清除快取並重新註冊設定
         add_action('admin_init', array($this, 'clear_options_cache'), 5);
@@ -118,10 +121,10 @@ class SyncFire {
 
         // 添加表單提交調試鎖子
         add_action('admin_init', array($this, 'debug_form_submission'));
-        
+
         // 添加設定測試鎖子
         add_action('admin_init', 'syncfire_test_settings', 999);
-        
+
         // 添加表單提交記錄鎖子
         add_action('admin_init', 'syncfire_log_form_submission');
 
@@ -443,6 +446,33 @@ class SyncFire {
      * @since 1.0.0
      * @return void
      */
+    /**
+     * Check if an array contains nested arrays
+     *
+     * @since 1.0.0
+     * @param array $array The array to check
+     * @return bool True if the array contains nested arrays, false otherwise
+     */
+    private function has_nested_array($array) {
+        if (!is_array($array)) {
+            return false;
+        }
+
+        foreach ($array as $value) {
+            if (is_array($value)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Log changes to options by comparing POST data with current option values
+     *
+     * @since 1.0.0
+     * @return void
+     */
     private function log_option_changes() {
         $log_file = SYNCFIRE_PLUGIN_DIR . 'logs/option_changes.log';
         $log_dir = dirname($log_file);
@@ -466,12 +496,18 @@ class SyncFire {
 
                 // Handle array values
                 if (is_array($new_value)) {
-                    $new_value_str = implode(', ', $new_value);
-                    $current_value_str = is_array($current_value) ? implode(', ', $current_value) : $current_value;
-
-                    if ($new_value_str !== $current_value_str) {
-                        $log_message .= "$option_name: Changed from [$current_value_str] to [$new_value_str]\n";
+                    // Handle nested arrays (like post type field mappings)
+                    if ($this->has_nested_array($new_value)) {
+                        $log_message .= "$option_name: Changed (contains nested array structure)\n";
                         $changes_detected = true;
+                    } else {
+                        $new_value_str = implode(', ', $new_value);
+                        $current_value_str = is_array($current_value) ? implode(', ', $current_value) : $current_value;
+
+                        if ($new_value_str !== $current_value_str) {
+                            $log_message .= "$option_name: Changed from [$current_value_str] to [$new_value_str]\n";
+                            $changes_detected = true;
+                        }
                     }
                 } else {
                     // For sensitive options, just log that it was changed, not the actual value

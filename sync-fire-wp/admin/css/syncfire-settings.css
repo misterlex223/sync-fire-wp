@@ -1,0 +1,94 @@
+/**
+ * SyncFire Settings Page Styles
+ */
+
+/* Collapsible sections */
+.syncfire-collapsible-section h3 {
+    cursor: pointer;
+    position: relative;
+    padding-right: 30px;
+}
+
+.syncfire-toggle-icon {
+    position: absolute;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    transition: transform 0.3s ease;
+}
+
+.syncfire-section-content {
+    transition: height 0.3s ease;
+}
+
+/* Connection status indicator */
+.syncfire-connection-status-indicator {
+    margin-bottom: 20px;
+}
+
+.syncfire-connection-status-indicator .notice {
+    margin: 5px 0 15px;
+}
+
+/* ACF fields section */
+.syncfire-acf-fields {
+    margin-top: 10px;
+    padding: 10px;
+    background-color: #f9f9f9;
+    border-left: 4px solid #2271b1;
+}
+
+.syncfire-acf-fields small {
+    color: #666;
+    font-style: italic;
+}
+
+/* Field mapping table */
+.syncfire-field-mapping {
+    margin-top: 15px;
+    border-collapse: collapse;
+    width: 100%;
+}
+
+.syncfire-field-mapping th,
+.syncfire-field-mapping td {
+    padding: 8px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+}
+
+.syncfire-field-mapping th {
+    background-color: #f2f2f2;
+}
+
+/* Post type fields container */
+.syncfire-post-type-fields {
+    margin-top: 20px;
+    padding: 15px;
+    background: #fff;
+    border: 1px solid #ccd0d4;
+    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.04);
+}
+
+.syncfire-post-type-fields h4 {
+    margin-top: 0;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #eee;
+}
+
+/* Debug tools section */
+#syncfire-debug-tools {
+    margin-top: 30px;
+}
+
+#syncfire-debug-tools h3 {
+    margin-top: 0;
+    cursor: pointer;
+}
+
+/* Firebase config section when moved to bottom */
+#syncfire-firebase-config {
+    margin-top: 20px;
+    border-top: 1px solid #ddd;
+    padding-top: 20px;
+}

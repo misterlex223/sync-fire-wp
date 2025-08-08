@@ -56,11 +56,11 @@ class SyncFire_Hooks {
         $this->loader = new SyncFire_Loader();
         $this->taxonomy_sync = new SyncFire_Taxonomy_Sync();
         $this->post_type_sync = new SyncFire_Post_Type_Sync();
-        
+
         $this->define_admin_hooks();
         $this->define_taxonomy_hooks();
         $this->define_post_type_hooks();
-        
+
         $this->loader->run();
     }
 
@@ -73,11 +73,11 @@ class SyncFire_Hooks {
      */
     private function define_admin_hooks() {
         $admin = new SyncFire_Admin();
-        
+
         // Admin scripts and styles
         $this->loader->add_action('admin_enqueue_scripts', $admin, 'enqueue_styles');
         $this->loader->add_action('admin_enqueue_scripts', $admin, 'enqueue_scripts');
-        
+
         // AJAX handlers
         $this->loader->add_action('wp_ajax_syncfire_resync_all', $admin, 'resync_all');
         $this->loader->add_action('wp_ajax_syncfire_resync_taxonomy', $admin, 'resync_taxonomy');
@@ -93,15 +93,16 @@ class SyncFire_Hooks {
     private function define_taxonomy_hooks() {
         // Hook into taxonomy term creation
         $this->loader->add_action('created_term', $this->taxonomy_sync, 'sync_term', 10, 3);
-        
+
         // Hook into taxonomy term update
         $this->loader->add_action('edited_term', $this->taxonomy_sync, 'sync_term', 10, 3);
-        
+
         // Hook into taxonomy term deletion
         $this->loader->add_action('delete_term', $this->taxonomy_sync, 'delete_term', 10, 4);
-        
+
         // Hook into taxonomy creation
-        $this->loader->add_action('registered_taxonomy', $this->taxonomy_sync, 'maybe_sync_new_taxonomy', 10, 3);
+        // TODO: to be continued
+        // $this->loader->add_action('registered_taxonomy', $this->taxonomy_sync, 'maybe_sync_new_taxonomy', 10, 3);
     }
 
     /**
@@ -113,18 +114,18 @@ class SyncFire_Hooks {
     private function define_post_type_hooks() {
         // Hook into post creation and update
         $this->loader->add_action('save_post', $this->post_type_sync, 'sync_post', 10, 3);
-        
+
         // Hook into post deletion
         $this->loader->add_action('before_delete_post', $this->post_type_sync, 'delete_post', 10, 1);
-        
+
         // Hook into post status changes
         $this->loader->add_action('transition_post_status', $this->post_type_sync, 'post_status_changed', 10, 3);
-        
+
         // Hook into post meta updates
         $this->loader->add_action('updated_post_meta', $this->post_type_sync, 'sync_post_meta', 10, 4);
         $this->loader->add_action('added_post_meta', $this->post_type_sync, 'sync_post_meta', 10, 4);
         $this->loader->add_action('deleted_post_meta', $this->post_type_sync, 'sync_post_meta', 10, 4);
-        
+
         // Hook into featured image changes
         $this->loader->add_action('updated_post_thumbnail', $this->post_type_sync, 'sync_featured_image', 10, 2);
         $this->loader->add_action('removed_post_thumbnail', $this->post_type_sync, 'sync_featured_image', 10, 1);

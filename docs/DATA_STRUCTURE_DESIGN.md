@@ -34,7 +34,7 @@ SyncFire 插件在 WordPress 資料庫的 `wp_options` 表中存儲以下選項�
 ---
 SyncFire 插件在 Firestore 中創建以下資料結構：
 ### 2.1 分類法集合
-**路徑：`taxonomies/{taxonomy_name}`**
+**路徑：`/taxonomies/{taxonomy_name}`**
 每個分類法文檔包含：
 ```json
 {
@@ -56,7 +56,7 @@ SyncFire 插件在 Firestore 中創建以下資料結構：
 }
 ```
 ### 2.2 文章類型集合
-**路徑：`{post_type}/{post_id}`**
+**路徑：`/posts/{post_type}/items/{post_id}`**
 每個文章文檔包含根據 `syncfire_post_type_fields` 和 `syncfire_post_type_field_mapping` 選項定義的欄位。例如：
 ```json
 {

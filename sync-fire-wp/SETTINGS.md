@@ -14,6 +14,11 @@
 - `SyncFire_Options::FIREBASE_APP_ID` (`syncfire_firebase_app_id`): Firebase App ID
 - `SyncFire_Options::FIREBASE_SERVICE_ACCOUNT` (`syncfire_firebase_service_account`): Firebase Service Account JSON
 
+### Firestore Emulator Settings
+- `SyncFire_Options::FIRESTORE_EMULATOR_ENABLED` (`syncfire_firestore_emulator_enabled`): Boolean flag to enable/disable emulator mode
+- `SyncFire_Options::FIRESTORE_EMULATOR_HOST` (`syncfire_firestore_emulator_host`): Host address of the Firestore emulator (default: localhost)
+- `SyncFire_Options::FIRESTORE_EMULATOR_PORT` (`syncfire_firestore_emulator_port`): Port number of the Firestore emulator (default: 8080)
+
 ### Taxonomy Sync Settings
 - `SyncFire_Options::TAXONOMIES_TO_SYNC` (`syncfire_taxonomies_to_sync`): List of taxonomies to synchronize with Firestore
 - `SyncFire_Options::TAXONOMY_ORDER_FIELD` (`syncfire_taxonomy_order_field`): Field to use for ordering taxonomies

@@ -106,6 +106,16 @@ function syncfire_sanitize_array($input) {
 }
 
 /**
+ * Sanitize boolean values
+ *
+ * @param mixed $input Input to sanitize
+ * @return bool Sanitized boolean
+ */
+function syncfire_sanitize_boolean($input) {
+    return (bool) $input;
+}
+
+/**
  * Log form submission data
  */
 function syncfire_log_form_submission() {
@@ -149,5 +159,63 @@ function syncfire_test_settings() {
 
     if (!empty($missing_options)) {
         error_log('SyncFire: Missing options: ' . implode(', ', $missing_options));
+    }
+}
+
+/**
+ * Check if emulator mode is enabled
+ *
+ * @since    1.1.0
+ * @return   boolean    True if emulator mode is enabled, false otherwise
+ */
+function syncfire_is_emulator_enabled() {
+    return (bool) get_option(SyncFire_Options::FIRESTORE_EMULATOR_ENABLED, false);
+}
+
+/**
+ * Get emulator configuration
+ *
+ * @since    1.1.0
+ * @return   array      Array containing emulator configuration
+ */
+function syncfire_get_emulator_config() {
+    return [
+        'enabled' => (bool) get_option(SyncFire_Options::FIRESTORE_EMULATOR_ENABLED, false),
+        'host' => get_option(SyncFire_Options::FIRESTORE_EMULATOR_HOST, 'localhost'),
+        'port' => get_option(SyncFire_Options::FIRESTORE_EMULATOR_PORT, '8080')
+    ];
+}
+
+/**
+ * Test emulator connection
+ *
+ * @since    1.1.0
+ * @return   boolean    True on success, false on failure
+ */
+function syncfire_test_emulator_connection() {
+    if (!syncfire_is_emulator_enabled()) {
+        error_log('SyncFire: Emulator is not enabled');
+        return false;
+    }
+
+    try {
+        // Load the Firestore class to test the connection
+        if (!class_exists('SyncFire_Firestore')) {
+            require_once SYNCFIRE_PLUGIN_DIR . 'includes/class-syncfire-firestore.php';
+        }
+
+        $firestore = new SyncFire_Firestore();
+        $result = $firestore->test_connection();
+
+        if ($result) {
+            error_log('SyncFire: Successfully connected to Firestore emulator');
+        } else {
+            error_log('SyncFire: Failed to connect to Firestore emulator');
+        }
+
+        return $result;
+    } catch (\Exception $e) {
+        error_log('SyncFire: Error during emulator connection test: ' . $e->getMessage());
+        return false;
     }
 }

@@ -91,6 +91,43 @@ if (!isset($connection_status)) {
             </td>
         </tr>
     </table>
+
+    <!-- Firestore Emulator Configuration Section -->
+    <div id="syncfire-emulator-config" class="syncfire-emulator-section" style="margin-top: 20px; padding: 15px; background: #f9f9f9; border: 1px solid #ddd;">
+        <h4><?php _e('Firestore Emulator Settings (Development Only)', 'sync-fire'); ?></h4>
+        <p class="description"><?php _e('Configure local Firestore emulator for development and testing. Enable this only in development environments.', 'sync-fire'); ?></p>
+
+        <table class="form-table">
+            <tr>
+                <th scope="row">
+                    <label for="<?php echo SyncFire_Options::FIRESTORE_EMULATOR_ENABLED; ?>"><?php _e('Enable Firestore Emulator', 'sync-fire'); ?></label>
+                </th>
+                <td>
+                    <input type="checkbox" name="<?php echo SyncFire_Options::FIRESTORE_EMULATOR_ENABLED; ?>" id="<?php echo SyncFire_Options::FIRESTORE_EMULATOR_ENABLED; ?>" value="1" <?php checked(get_option(SyncFire_Options::FIRESTORE_EMULATOR_ENABLED, false)); ?> />
+                    <label for="<?php echo SyncFire_Options::FIRESTORE_EMULATOR_ENABLED; ?>"><?php _e('Use local Firestore emulator instead of production Firestore', 'sync-fire'); ?></label>
+                    <p class="description"><?php _e('Enable this to use a local Firestore emulator for development and testing.', 'sync-fire'); ?></p>
+                </td>
+            </tr>
+            <tr>
+                <th scope="row">
+                    <label for="<?php echo SyncFire_Options::FIRESTORE_EMULATOR_HOST; ?>"><?php _e('Emulator Host', 'sync-fire'); ?></label>
+                </th>
+                <td>
+                    <input type="text" name="<?php echo SyncFire_Options::FIRESTORE_EMULATOR_HOST; ?>" id="<?php echo SyncFire_Options::FIRESTORE_EMULATOR_HOST; ?>" class="regular-text" value="<?php echo esc_attr(get_option(SyncFire_Options::FIRESTORE_EMULATOR_HOST, 'localhost')); ?>" placeholder="localhost" />
+                    <p class="description"><?php _e('Host address of your Firestore emulator (default: localhost).', 'sync-fire'); ?></p>
+                </td>
+            </tr>
+            <tr>
+                <th scope="row">
+                    <label for="<?php echo SyncFire_Options::FIRESTORE_EMULATOR_PORT; ?>"><?php _e('Emulator Port', 'sync-fire'); ?></label>
+                </th>
+                <td>
+                    <input type="text" name="<?php echo SyncFire_Options::FIRESTORE_EMULATOR_PORT; ?>" id="<?php echo SyncFire_Options::FIRESTORE_EMULATOR_PORT; ?>" class="regular-text" value="<?php echo esc_attr(get_option(SyncFire_Options::FIRESTORE_EMULATOR_PORT, '8080')); ?>" placeholder="8080" />
+                    <p class="description"><?php _e('Port number of your Firestore emulator (default: 8080).', 'sync-fire'); ?></p>
+                </td>
+            </tr>
+        </table>
+    </div>
     </div>
 
     <div id="syncfire-debug-tools" class="syncfire-debug-section syncfire-collapsible-section" style="margin-top: 30px; padding: 15px; background: #f8f8f8; border: 1px solid #ddd;">

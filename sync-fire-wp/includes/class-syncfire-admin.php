@@ -319,10 +319,43 @@ class SyncFire_Admin {
         // Test the connection
         $result = $firestore->test_connection();
 
+        // Check if emulator is enabled to provide appropriate message
+        $emulator_enabled = (bool) get_option(SyncFire_Options::FIRESTORE_EMULATOR_ENABLED, false);
+        $emulator_host = get_option(SyncFire_Options::FIRESTORE_EMULATOR_HOST, 'localhost');
+        $emulator_port = get_option(SyncFire_Options::FIRESTORE_EMULATOR_PORT, '8080');
+
         if ( $result ) {
-            wp_send_json_success( array( 'message' => __( 'Successfully connected to Firestore.', 'sync-fire' ) ) );
+            if ($emulator_enabled) {
+                wp_send_json_success( array( 
+                    'message' => sprintf(
+                        __( 'Successfully connected to Firestore emulator at %s:%s.', 'sync-fire' ),
+                        $emulator_host,
+                        $emulator_port
+                    ),
+                    'connection_type' => 'emulator'
+                ) );
+            } else {
+                wp_send_json_success( array( 
+                    'message' => __( 'Successfully connected to production Firestore.', 'sync-fire' ),
+                    'connection_type' => 'production'
+                ) );
+            }
         } else {
-            wp_send_json_error( array( 'message' => __( 'Failed to connect to Firestore. Please check your Firebase configuration settings.', 'sync-fire' ) ) );
+            if ($emulator_enabled) {
+                wp_send_json_error( array( 
+                    'message' => sprintf(
+                        __( 'Failed to connect to Firestore emulator at %s:%s. Please check your emulator settings and ensure the emulator is running.', 'sync-fire' ),
+                        $emulator_host,
+                        $emulator_port
+                    ),
+                    'connection_type' => 'emulator'
+                ) );
+            } else {
+                wp_send_json_error( array( 
+                    'message' => __( 'Failed to connect to Firestore. Please check your Firebase configuration settings.', 'sync-fire' ),
+                    'connection_type' => 'production'
+                ) );
+            }
         }
     }
 
@@ -566,7 +599,11 @@ class SyncFire_Admin {
             SyncFire_Options::FIREBASE_STORAGE_BUCKET,
             SyncFire_Options::FIREBASE_MESSAGING_SENDER_ID,
             SyncFire_Options::FIREBASE_APP_ID,
-            SyncFire_Options::FIREBASE_SERVICE_ACCOUNT
+            SyncFire_Options::FIREBASE_SERVICE_ACCOUNT,
+            // Also include emulator settings
+            SyncFire_Options::FIRESTORE_EMULATOR_ENABLED,
+            SyncFire_Options::FIRESTORE_EMULATOR_HOST,
+            SyncFire_Options::FIRESTORE_EMULATOR_PORT
         );
         
         foreach ($firebase_options as $option) {

@@ -1,60 +1,90 @@
-# Dev
-logs/
-.vscode/
-wordpress.env
-xdebug.ini
+# General
+*.log
+*.tmp
+*.temp
+.DS_Store
+Thumbs.db
+desktop.ini
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
 
-# Releases
-packages/
+# IgniStack
+.kai-notify.json
+
+# Editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Dependencies
+node_modules/
+vendor/
+bower_components/
+
+# Environment
+.env
+.env.local
+.env.*.local
+.env.production
+.env.development
+
+# OS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+desktop.ini
+
+# Backup files
+*~
+*.bak
+*.backup
+*.old
+*.orig
+*~
+
+# Development
+coverage/
+.nyc_output/
+test/
+tests/
+
+# WordPress specific
+wp-config.php
+wp-content/uploads/
+wp-content/cache/
+wp-content/backup-db/
+*.sql
+
+# Docker (if removed)
+*.yml
+*.yaml
+.dockerignore
+
+# Packages
+*.zip
+*.tar.gz
+*.tar
+*.rar
+*.7z
 
 # Composer
-vendor/
+composer.phar
+composer.lock
 
-# Wordpress - ignore core, configuration, examples, uploads and logs.
-# https://github.com/github/gitignore/blob/main/WordPress.gitignore
+# Build artifacts
+build/
+dist/
+out/
+target/
 
-# Core
-#
-# Note: if you want to stage/commit WP core files
-# you can delete this whole section/until Configuration.
-/wp-admin/
-/wp-content/index.php
-/wp-content/languages
-/wp-content/plugins/index.php
-/wp-content/themes/index.php
-/wp-includes/
-/index.php
-/license.txt
-/readme.html
-/wp-*.php
-/xmlrpc.php
-
-# Configuration
-wp-config.php
-
-# Example themes
-/wp-content/themes/twenty*/
-
-# Example plugin
-/wp-content/plugins/hello.php
-
-# Uploads
-/wp-content/uploads/
-
-# Log files
-*.log
-
-# htaccess
-/.htaccess
-
-# All plugins
-#
-# Note: If you wish to whitelist plugins,
-# uncomment the next line
-#/wp-content/plugins
-
-# All themes
-#
-# Note: If you wish to whitelist themes,
-# uncomment the next line
-#/wp-content/themes
+# SyncFire specific
+packages/

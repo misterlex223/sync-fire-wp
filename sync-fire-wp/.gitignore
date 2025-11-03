@@ -1,0 +1,82 @@
+# WordPress core files and directories
+wp-config.php
+wp-content/uploads/
+wp-content/cache/
+wp-content/upgrade/
+wp-content/backup-db/
+wp-content/languages/
+*.sql
+
+# WordPress-Plugin specific
+build/
+dist/
+*.zip
+*.tar.gz
+
+# Dependencies
+node_modules/
+bower_components/
+vendor/
+
+# Composer (dependencies will be installed via composer install)
+composer.phar
+composer.lock
+
+# Logs
+*.log
+logs/
+wp-content/debug.log
+
+# Environment specific
+.env
+.env.local
+.env.*.local
+.env.production
+.env.development
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+desktop.ini
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Backup files
+*~
+*.bak
+*.tmp
+.swp
+
+# Sensitive data (Firebase config and other settings)
+wp-content/plugins/sync-fire/config/
+wp-content/plugins/sync-fire/.env
+wp-content/plugins/sync-fire/firebase-config.json
+
+# Development-specific files
+coverage/
+.nyc_output/
+test/
+tests/
+
+# PHP related
+*.php~
+phpunit.xml
+phpunit.xml.dist
+
+# Web server
+.htaccess
+.web
+!.htaccess
+
+# WordPress plugin development specific
+tags

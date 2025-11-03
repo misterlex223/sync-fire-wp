@@ -40,6 +40,11 @@ class SyncFire_Options {
     const POST_TYPE_FIELDS = 'syncfire_post_type_fields';
     const POST_TYPE_FIELD_MAPPING = 'syncfire_post_type_field_mapping';
 
+    // Firestore emulator settings
+    const FIRESTORE_EMULATOR_ENABLED = 'syncfire_firestore_emulator_enabled';
+    const FIRESTORE_EMULATOR_HOST = 'syncfire_firestore_emulator_host';
+    const FIRESTORE_EMULATOR_PORT = 'syncfire_firestore_emulator_port';
+
     // Migration tracking
     const MIGRATION_COMPLETE = 'syncfire_migration_complete';
 
@@ -57,6 +62,9 @@ class SyncFire_Options {
             self::FIREBASE_MESSAGING_SENDER_ID,
             self::FIREBASE_APP_ID,
             self::FIREBASE_SERVICE_ACCOUNT,
+            self::FIRESTORE_EMULATOR_ENABLED,
+            self::FIRESTORE_EMULATOR_HOST,
+            self::FIRESTORE_EMULATOR_PORT,
             self::TAXONOMIES_TO_SYNC,
             self::TAXONOMY_ORDER_FIELD,
             self::TAXONOMY_SORT_ORDER,

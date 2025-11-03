@@ -139,6 +139,33 @@ class SyncFire_Firestore {
     private $service_account;
 
     /**
+     * Whether the Firestore emulator is enabled.
+     *
+     * @since    1.1.0
+     * @access   private
+     * @var      boolean   $emulator_enabled   Whether the Firestore emulator is enabled.
+     */
+    private $emulator_enabled;
+
+    /**
+     * The Firestore emulator host.
+     *
+     * @since    1.1.0
+     * @access   private
+     * @var      string    $emulator_host      The Firestore emulator host.
+     */
+    private $emulator_host;
+
+    /**
+     * The Firestore emulator port.
+     *
+     * @since    1.1.0
+     * @access   private
+     * @var      string    $emulator_port      The Firestore emulator port.
+     */
+    private $emulator_port;
+
+    /**
      * Initialize the class and set its properties.
      *
      * @since    1.0.0
@@ -152,6 +179,11 @@ class SyncFire_Firestore {
         $this->messaging_sender_id = get_option(SyncFire_Options::FIREBASE_MESSAGING_SENDER_ID, '');
         $this->app_id = get_option(SyncFire_Options::FIREBASE_APP_ID, '');
         $this->service_account = get_option(SyncFire_Options::FIREBASE_SERVICE_ACCOUNT, '');
+
+        // Load Firestore emulator configuration
+        $this->emulator_enabled = (bool) get_option(SyncFire_Options::FIRESTORE_EMULATOR_ENABLED, false);
+        $this->emulator_host = get_option(SyncFire_Options::FIRESTORE_EMULATOR_HOST, 'localhost');
+        $this->emulator_port = get_option(SyncFire_Options::FIRESTORE_EMULATOR_PORT, '8080');
 
         // Initialize Firestore client if we have the required configuration
         $this->init_firestore();
@@ -218,7 +250,32 @@ class SyncFire_Firestore {
      */
     private function init_firestore() {
         try {
-            // Check if we have the required configuration
+            // Check if Firestore emulator is enabled
+            if ($this->emulator_enabled) {
+                error_log('SyncFire: Firestore emulator enabled - connecting to ' . $this->emulator_host . ':' . $this->emulator_port);
+                
+                // For emulator, we don't need service account authentication
+                // Set environment variable for emulator (this helps the Google SDK auto-detect the emulator)
+                putenv('FIRESTORE_EMULATOR_HOST=' . $this->emulator_host . ':' . $this->emulator_port);
+                
+                // Configure the Firestore client options for emulator
+                $options = [
+                    'projectId' => $this->project_id,
+                    'emulatorHost' => $this->emulator_host . ':' . $this->emulator_port
+                ];
+
+                error_log('SyncFire: Creating Firestore client with emulator options: ' . json_encode($options));
+
+                // Create the Firestore client for emulator (no authentication needed)
+                $this->firestore = new FirestoreClient($options);
+                $this->using_rest_fallback = false;
+
+                error_log('SyncFire: Firestore emulator client initialized successfully');
+                
+                return true;
+            }
+
+            // Check if we have the required configuration for production
             if (empty($this->project_id) || empty($this->service_account)) {
                 error_log('SyncFire: Missing required Firebase configuration');
                 return false;
@@ -305,6 +362,12 @@ class SyncFire_Firestore {
                 }
             }
 
+            // If emulator is enabled, test connection differently
+            if ($this->emulator_enabled) {
+                error_log('SyncFire: Testing emulator connection');
+                return $this->test_emulator_connection();
+            }
+
             if ($this->using_rest_fallback) {
                 // Test REST connection by making a simple request
                 return $this->test_rest_connection();
@@ -318,6 +381,71 @@ class SyncFire_Firestore {
             }
         } catch (\Exception $e) {
             error_log('SyncFire: Failed to connect to Firestore: ' . $e->getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Test the connection to Firestore Emulator.
+     *
+     * @since    1.1.0
+     * @return   boolean    True on success, false on failure.
+     */
+    private function test_emulator_connection() {
+        try {
+            // For emulator, we can test the REST client or the gRPC client
+            if ($this->rest_client) {
+                // If using REST fallback, test with REST client
+                return $this->test_emulator_rest_connection();
+            } elseif ($this->firestore) {
+                // If using native client, test with native client
+                // Make a simple request to verify connectivity
+                $collections = $this->firestore->collections();
+                return true;
+            } else {
+                error_log('SyncFire: No client available for emulator connection test');
+                return false;
+            }
+        } catch (\Exception $e) {
+            error_log('SyncFire: Failed to connect to Firestore emulator: ' . $e->getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Test the connection to Firestore Emulator using REST API.
+     *
+     * @since    1.1.0
+     * @return   boolean    True on success, false on failure.
+     */
+    private function test_emulator_rest_connection() {
+        try {
+            // Check if the REST client is initialized
+            if (!$this->rest_client) {
+                error_log('SyncFire: REST client not initialized for emulator');
+                return false;
+            }
+
+            // Make a simple request to emulator to test connectivity
+            // Try to list collections or access a basic endpoint
+            try {
+                $response = $this->rest_client->get("v1/projects/{$this->project_id}/databases/(default)/documents", [
+                    'headers' => [
+                        'Content-Type' => 'application/json'
+                    ]
+                ]);
+
+                if ($response->getStatusCode() >= 200 && $response->getStatusCode() < 300) {
+                    error_log('SyncFire: Successfully connected to Firestore emulator via REST');
+                    return true;
+                }
+            } catch (\Exception $e) {
+                error_log('SyncFire: Emulator connection test failed: ' . $e->getMessage());
+            }
+
+            return false;
+        } catch (\Exception $e) {
+            error_log('SyncFire: Failed to connect to Firestore emulator via REST: ' . $e->getMessage());
             return false;
         }
     }
@@ -682,21 +810,41 @@ class SyncFire_Firestore {
      */
     private function init_rest_client($service_account_data) {
         try {
-            // Set up the Firestore REST API URL
-            $this->firestore_api_url = "https://firestore.googleapis.com/v1/projects/{$this->project_id}/databases/(default)/documents";
+            // Check if emulator is enabled
+            if ($this->emulator_enabled) {
+                // For emulator, use direct connection without authentication
+                $this->firestore_api_url = "http://{$this->emulator_host}:{$this->emulator_port}/v1/projects/{$this->project_id}/databases/(default)/documents";
+                
+                // Initialize the REST client for emulator (no authentication needed)
+                $this->rest_client = new GuzzleClient([
+                    'base_uri' => "http://{$this->emulator_host}:{$this->emulator_port}/",
+                    'headers' => [
+                        'Content-Type' => 'application/json',
+                        'Accept' => 'application/json'
+                    ]
+                ]);
+                
+                // Set access token to empty string for emulator
+                $this->access_token = '';
+                
+                error_log('SyncFire: REST client initialized for emulator: http://' . $this->emulator_host . ':' . $this->emulator_port);
+            } else {
+                // Set up the Firestore REST API URL for production
+                $this->firestore_api_url = "https://firestore.googleapis.com/v1/projects/{$this->project_id}/databases/(default)/documents";
 
-            // Generate an access token from service account
-            $this->access_token = $this->generate_access_token($service_account_data);
+                // Generate an access token from service account
+                $this->access_token = $this->generate_access_token($service_account_data);
 
-            // Initialize the REST client
-            $this->rest_client = new GuzzleClient([
-                'base_uri' => 'https://firestore.googleapis.com/',
-                'headers' => [
-                    'Authorization' => 'Bearer ' . $this->access_token,
-                    'Content-Type' => 'application/json',
-                    'Accept' => 'application/json'
-                ]
-            ]);
+                // Initialize the REST client
+                $this->rest_client = new GuzzleClient([
+                    'base_uri' => 'https://firestore.googleapis.com/',
+                    'headers' => [
+                        'Authorization' => 'Bearer ' . $this->access_token,
+                        'Content-Type' => 'application/json',
+                        'Accept' => 'application/json'
+                    ]
+                ]);
+            }
 
             return true;
         } catch (\Exception $e) {

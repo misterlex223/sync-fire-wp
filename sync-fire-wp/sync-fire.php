@@ -227,6 +227,32 @@ class SyncFire {
             )
         );
 
+        // Firestore emulator settings
+        syncfire_register_option(
+            SyncFire_Options::FIRESTORE_EMULATOR_ENABLED,
+            array(
+                'type' => 'boolean',
+                'sanitize_callback' => 'syncfire_sanitize_boolean',
+                'default' => false,
+            )
+        );
+        syncfire_register_option(
+            SyncFire_Options::FIRESTORE_EMULATOR_HOST,
+            array(
+                'type' => 'string',
+                'sanitize_callback' => 'sanitize_text_field',
+                'default' => 'localhost',
+            )
+        );
+        syncfire_register_option(
+            SyncFire_Options::FIRESTORE_EMULATOR_PORT,
+            array(
+                'type' => 'string',
+                'sanitize_callback' => 'sanitize_text_field',
+                'default' => '8080',
+            )
+        );
+
         // Taxonomy sync settings
         syncfire_register_option(
             SyncFire_Options::TAXONOMIES_TO_SYNC,

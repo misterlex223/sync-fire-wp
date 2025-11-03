@@ -54,10 +54,10 @@ install_zip_alternative() {
 }
 
 # Set variables
-PLUGIN_DIR="/home/lex.yang/workspace/SyncFire/sync-fire-wp"
+PLUGIN_DIR="/home/flexy/workspace/sync-fire-wp"
 PACKAGE_NAME="sync-fire-wp"
 TIMESTAMP=$(date +"%Y%m%d_%H%M%S")
-OUTPUT_DIR="/home/lex.yang/workspace/SyncFire/packages"
+OUTPUT_DIR="/home/flexy/workspace/packages"
 OUTPUT_FILE="${OUTPUT_DIR}/${PACKAGE_NAME}_${TIMESTAMP}.zip"
 
 # Print header

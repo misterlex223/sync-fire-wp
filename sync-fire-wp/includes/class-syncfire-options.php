@@ -26,6 +26,7 @@ class SyncFire_Options {
     const FIREBASE_MESSAGING_SENDER_ID = 'syncfire_firebase_messaging_sender_id';
     const FIREBASE_APP_ID = 'syncfire_firebase_app_id';
     const FIREBASE_SERVICE_ACCOUNT = 'syncfire_firebase_service_account';
+    const FIREBASE_DATABASE_ID = 'syncfire_firebase_database_id';
 
     // Google MAP API settings
     const GOOGLE_MAP_API_KEY = 'syncfire_google_maps_api_key';
@@ -62,6 +63,7 @@ class SyncFire_Options {
             self::FIREBASE_MESSAGING_SENDER_ID,
             self::FIREBASE_APP_ID,
             self::FIREBASE_SERVICE_ACCOUNT,
+            self::FIREBASE_DATABASE_ID,
             self::FIRESTORE_EMULATOR_ENABLED,
             self::FIRESTORE_EMULATOR_HOST,
             self::FIRESTORE_EMULATOR_PORT,

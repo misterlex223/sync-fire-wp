@@ -55,6 +55,15 @@ if (!isset($connection_status)) {
         </tr>
         <tr>
             <th scope="row">
+                <label for="<?php echo SyncFire_Options::FIREBASE_DATABASE_ID; ?>"><?php _e('Database ID', 'sync-fire'); ?></label>
+            </th>
+            <td>
+                <input type="text" name="<?php echo SyncFire_Options::FIREBASE_DATABASE_ID; ?>" id="<?php echo SyncFire_Options::FIREBASE_DATABASE_ID; ?>" class="regular-text" value="<?php echo esc_attr(get_option(SyncFire_Options::FIREBASE_DATABASE_ID, '(default)')); ?>" placeholder="(default)" />
+                <p class="description"><?php _e('Your Firestore Database ID. Leave as "(default)" for the default database, or specify a named database ID.', 'sync-fire'); ?></p>
+            </td>
+        </tr>
+        <tr>
+            <th scope="row">
                 <label for="<?php echo SyncFire_Options::FIREBASE_STORAGE_BUCKET; ?>"><?php _e('Storage Bucket', 'sync-fire'); ?></label>
             </th>
             <td>

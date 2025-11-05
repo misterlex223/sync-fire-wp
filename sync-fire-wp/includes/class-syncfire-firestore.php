@@ -166,6 +166,15 @@ class SyncFire_Firestore {
     private $emulator_port;
 
     /**
+     * The Firestore database ID.
+     *
+     * @since    1.2.0
+     * @access   private
+     * @var      string    $database_id    The Firestore database ID (defaults to '(default)').
+     */
+    private $database_id;
+
+    /**
      * Initialize the class and set its properties.
      *
      * @since    1.0.0
@@ -179,6 +188,7 @@ class SyncFire_Firestore {
         $this->messaging_sender_id = get_option(SyncFire_Options::FIREBASE_MESSAGING_SENDER_ID, '');
         $this->app_id = get_option(SyncFire_Options::FIREBASE_APP_ID, '');
         $this->service_account = get_option(SyncFire_Options::FIREBASE_SERVICE_ACCOUNT, '');
+        $this->database_id = get_option(SyncFire_Options::FIREBASE_DATABASE_ID, '(default)');
 
         // Load Firestore emulator configuration
         $this->emulator_enabled = (bool) get_option(SyncFire_Options::FIRESTORE_EMULATOR_ENABLED, false);
@@ -261,6 +271,7 @@ class SyncFire_Firestore {
                 // Configure the Firestore client options for emulator
                 $options = [
                     'projectId' => $this->project_id,
+                    'database' => $this->database_id,
                     'emulatorHost' => $this->emulator_host . ':' . $this->emulator_port
                 ];
 
@@ -309,6 +320,7 @@ class SyncFire_Firestore {
                 // Configure the Firestore client options
                 $options = [
                     'projectId' => $this->project_id,
+                    'database' => $this->database_id,
                     'keyFilePath' => $service_account_file
                 ];
 
@@ -429,7 +441,7 @@ class SyncFire_Firestore {
             // Make a simple request to emulator to test connectivity
             // Try to list collections or access a basic endpoint
             try {
-                $response = $this->rest_client->get("v1/projects/{$this->project_id}/databases/(default)/documents", [
+                $response = $this->rest_client->get("v1/projects/{$this->project_id}/databases/{$this->database_id}/documents", [
                     'headers' => [
                         'Content-Type' => 'application/json'
                     ]
@@ -466,7 +478,7 @@ class SyncFire_Firestore {
 
             // Make a simple request to get project info
             // Using a different endpoint that should always exist
-            $url = "v1/projects/{$this->project_id}/databases/(default)";
+            $url = "v1/projects/{$this->project_id}/databases/{$this->database_id}";
 
             $response = $this->rest_client->get($url, [
                 'headers' => [
@@ -813,8 +825,8 @@ class SyncFire_Firestore {
             // Check if emulator is enabled
             if ($this->emulator_enabled) {
                 // For emulator, use direct connection without authentication
-                $this->firestore_api_url = "http://{$this->emulator_host}:{$this->emulator_port}/v1/projects/{$this->project_id}/databases/(default)/documents";
-                
+                $this->firestore_api_url = "http://{$this->emulator_host}:{$this->emulator_port}/v1/projects/{$this->project_id}/databases/{$this->database_id}/documents";
+
                 // Initialize the REST client for emulator (no authentication needed)
                 $this->rest_client = new GuzzleClient([
                     'base_uri' => "http://{$this->emulator_host}:{$this->emulator_port}/",
@@ -823,14 +835,14 @@ class SyncFire_Firestore {
                         'Accept' => 'application/json'
                     ]
                 ]);
-                
+
                 // Set access token to empty string for emulator
                 $this->access_token = '';
-                
+
                 error_log('SyncFire: REST client initialized for emulator: http://' . $this->emulator_host . ':' . $this->emulator_port);
             } else {
                 // Set up the Firestore REST API URL for production
-                $this->firestore_api_url = "https://firestore.googleapis.com/v1/projects/{$this->project_id}/databases/(default)/documents";
+                $this->firestore_api_url = "https://firestore.googleapis.com/v1/projects/{$this->project_id}/databases/{$this->database_id}/documents";
 
                 // Generate an access token from service account
                 $this->access_token = $this->generate_access_token($service_account_data);
@@ -950,7 +962,7 @@ class SyncFire_Firestore {
             $firestore_data = $this->format_data_for_rest($data);
 
             // Create the request URL
-            $base_url = "v1/projects/{$this->project_id}/databases/(default)/documents";
+            $base_url = "v1/projects/{$this->project_id}/databases/{$this->database_id}/documents";
 
             // Check if we're dealing with a taxonomy (they need special handling)
             $is_taxonomy = strpos($document_path, 'taxonomies/') === 0;
@@ -1241,7 +1253,7 @@ class SyncFire_Firestore {
             }
 
             // Create the request URL
-            $url = "v1/projects/{$this->project_id}/databases/(default)/documents/{$document_path}";
+            $url = "v1/projects/{$this->project_id}/databases/{$this->database_id}/documents/{$document_path}";
 
             // Make the request
             $response = $this->rest_client->delete($url, [
@@ -1283,7 +1295,7 @@ class SyncFire_Firestore {
             }
 
             // Create the request URL
-            $url = "v1/projects/{$this->project_id}/databases/(default)/documents/{$document_path}";
+            $url = "v1/projects/{$this->project_id}/databases/{$this->database_id}/documents/{$document_path}";
 
             // Make the request
             $response = $this->rest_client->get($url, [

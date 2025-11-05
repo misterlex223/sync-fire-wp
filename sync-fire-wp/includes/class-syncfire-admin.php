@@ -596,6 +596,7 @@ class SyncFire_Admin {
             SyncFire_Options::FIREBASE_API_KEY,
             SyncFire_Options::FIREBASE_AUTH_DOMAIN,
             SyncFire_Options::FIREBASE_PROJECT_ID,
+            SyncFire_Options::FIREBASE_DATABASE_ID,
             SyncFire_Options::FIREBASE_STORAGE_BUCKET,
             SyncFire_Options::FIREBASE_MESSAGING_SENDER_ID,
             SyncFire_Options::FIREBASE_APP_ID,

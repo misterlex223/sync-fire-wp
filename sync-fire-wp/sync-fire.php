@@ -111,6 +111,7 @@ class SyncFire {
         add_action('pre_update_option_' . SyncFire_Options::FIREBASE_API_KEY, array($this, 'log_option_update'), 10, 3);
         add_action('pre_update_option_' . SyncFire_Options::FIREBASE_AUTH_DOMAIN, array($this, 'log_option_update'), 10, 3);
         add_action('pre_update_option_' . SyncFire_Options::FIREBASE_PROJECT_ID, array($this, 'log_option_update'), 10, 3);
+        add_action('pre_update_option_' . SyncFire_Options::FIREBASE_DATABASE_ID, array($this, 'log_option_update'), 10, 3);
         add_action('pre_update_option_' . SyncFire_Options::FIREBASE_STORAGE_BUCKET, array($this, 'log_option_update'), 10, 3);
         add_action('pre_update_option_' . SyncFire_Options::FIREBASE_MESSAGING_SENDER_ID, array($this, 'log_option_update'), 10, 3);
         add_action('pre_update_option_' . SyncFire_Options::FIREBASE_APP_ID, array($this, 'log_option_update'), 10, 3);
@@ -190,6 +191,14 @@ class SyncFire {
                 'type' => 'string',
                 'sanitize_callback' => 'sanitize_text_field',
                 'default' => '',
+            )
+        );
+        syncfire_register_option(
+            SyncFire_Options::FIREBASE_DATABASE_ID,
+            array(
+                'type' => 'string',
+                'sanitize_callback' => 'sanitize_text_field',
+                'default' => '(default)',
             )
         );
         syncfire_register_option(

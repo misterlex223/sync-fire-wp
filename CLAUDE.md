@@ -8,6 +8,39 @@ SyncFire is a WordPress plugin that provides real-time synchronization between W
 
 ## Development Commands
 
+### WP-CLI Commands (Primary Interface for AI Assistants)
+
+SyncFire includes a comprehensive WP-CLI interface designed for AI-assisted development and automation. See [AI_README.md](./AI_README.md) for AI-friendly quick reference and [CLI-REFERENCE.md](./sync-fire-wp/CLI-REFERENCE.md) for complete documentation.
+
+```bash
+# Configuration
+wp syncfire config --project-id=my-project --service-account=/path/to/key.json
+wp syncfire config --project-id=my-project --database-id=production
+wp syncfire config --emulator --project-id=dev-project
+wp syncfire status
+
+# Taxonomy Management
+wp syncfire taxonomy enable category post_tag movie-genre
+wp syncfire taxonomy disable category
+wp syncfire taxonomy list
+wp syncfire taxonomy sync category --all
+
+# Post Type Management
+wp syncfire post-type enable post --fields=title,content,acf
+wp syncfire post-type disable post
+wp syncfire post-type list
+wp syncfire post-type sync post --all
+wp syncfire post-type fields movie --set=title,director,rating
+
+# Schema Integration (works with ignis-schema-wp)
+wp syncfire import post-type movie --auto-sync --sync-now
+wp syncfire import taxonomy movie-genre --auto-sync --sync-now
+
+# Testing and Diagnostics
+wp syncfire test --verbose
+wp syncfire stats
+```
+
 ### Plugin Deployment and Packaging
 
 ```bash
@@ -43,7 +76,10 @@ composer install --no-dev --optimize-autoloader --ignore-platform-reqs
 # Start Firestore emulator for local testing
 firebase emulators:start --only firestore
 
-# The plugin supports emulator mode - enable in settings with:
+# Configure plugin for emulator via CLI
+wp syncfire config --emulator --project-id=demo-project
+
+# Or via admin settings:
 # Host: localhost
 # Port: 8080 (default)
 ```
@@ -194,3 +230,200 @@ The plugin hooks into WordPress actions to sync in real-time:
 - All user inputs are sanitized and validated
 - Emulator mode should only be used in secure development environments
 - Service account JSON credentials should never be committed to version control
+
+## WP-CLI Integration
+
+SyncFire provides a complete WP-CLI interface for automation and AI-assisted development. The CLI is located at `sync-fire-wp/cli/class-syncfire-command.php`.
+
+### CLI Architecture
+
+- **Command Class**: `SyncFire\CLI\SyncFireCommand` extends `WP_CLI_Command`
+- **Auto-loaded**: Automatically loaded when WP-CLI is available
+- **Namespace**: Commands are available under `wp syncfire`
+
+### Key CLI Components
+
+1. **Configuration Management** (`wp syncfire config`)
+   - Firebase project and database configuration
+   - Service account setup
+   - Emulator mode toggle
+
+2. **Taxonomy Sync** (`wp syncfire taxonomy`)
+   - Enable/disable sync for taxonomies
+   - List sync status
+   - Manual sync trigger
+
+3. **Post Type Sync** (`wp syncfire post-type`)
+   - Enable/disable sync for post types
+   - Field configuration
+   - Manual sync trigger
+
+4. **Schema Integration** (`wp syncfire import`)
+   - Import from ignis-schema-wp
+   - Auto-configure sync
+   - Immediate data sync
+
+5. **Testing & Diagnostics** (`wp syncfire test`, `wp syncfire stats`)
+   - Connection testing
+   - Sync statistics
+   - Status reporting
+
+### Integration with ignis-schema-wp
+
+SyncFire CLI is designed to work seamlessly with ignis-schema-wp for complete WordPress data management:
+
+**Complete Workflow Example:**
+
+```bash
+# 1. Create schema with ignis-schema-wp
+wp schema create movie --type=post-type \
+  --prompt="Movie database with director, rating, release date"
+
+wp schema create movie-genre --type=taxonomy \
+  --prompt="Movie genres with icons and colors"
+
+# 2. Validate schemas
+wp schema validate movie --type=post-type
+wp schema validate movie-genre --type=taxonomy
+
+# 3. Register in WordPress
+wp schema register --type=all
+
+# 4. Configure SyncFire and enable sync
+wp syncfire config --project-id=my-project --service-account=/path/to/key.json
+wp syncfire import post-type movie --auto-sync --sync-now
+wp syncfire import taxonomy movie-genre --auto-sync --sync-now
+
+# 5. Generate TypeScript types for frontend
+wp schema export_all --type=all --output=./frontend/types
+
+# 6. Verify everything
+wp syncfire stats
+wp schema list --type=all
+```
+
+### AI-Assisted Development Patterns
+
+**Pattern 1: Quick Content Type Creation**
+```bash
+# AI can execute this entire workflow
+CONTENT_TYPE="event"
+PROMPT="Event management with date, time, location, RSVP tracking"
+
+wp schema create "$CONTENT_TYPE" --type=post-type --prompt="$PROMPT"
+wp schema register --type=post-type --slug="$CONTENT_TYPE"
+wp syncfire import post-type "$CONTENT_TYPE" --auto-sync
+wp schema flush
+```
+
+**Pattern 2: Development to Production Migration**
+```bash
+# Switch from emulator to production
+wp syncfire config \
+  --project-id="${PROD_PROJECT_ID}" \
+  --database-id="production" \
+  --service-account="${PROD_SERVICE_ACCOUNT_PATH}"
+
+wp syncfire test --verbose
+wp syncfire taxonomy sync --all
+wp syncfire post-type sync --all
+```
+
+**Pattern 3: Bulk Configuration**
+```bash
+# Configure multiple taxonomies and post types at once
+for taxonomy in category post_tag movie-genre; do
+  wp syncfire taxonomy enable "$taxonomy"
+done
+
+for post_type in post page movie; do
+  wp syncfire post-type enable "$post_type" --fields=title,content,acf
+done
+
+wp syncfire stats
+```
+
+## AI Assistant Guidelines
+
+When working with SyncFire, AI assistants should:
+
+1. **Use CLI First**: Always prefer WP-CLI commands over manual admin configuration
+2. **Test Connections**: Run `wp syncfire test --verbose` after configuration changes
+3. **Verify Status**: Use `wp syncfire status` and `wp syncfire stats` to confirm operations
+4. **Schema Integration**: Use `wp syncfire import` to connect ignis-schema-wp schemas with sync
+5. **Batch Operations**: Use `--all` flags for bulk operations when appropriate
+6. **Check Logs**: Monitor `sync-fire-wp/logs/` for detailed operation logs
+
+### Example AI Workflow
+
+When asked to "set up a movie database with Firestore sync":
+
+```bash
+# 1. Create data model
+wp schema create movie --type=post-type \
+  --prompt="Movie database with title, director, rating, release date, trailer URL, box office revenue"
+
+wp schema create movie-genre --type=taxonomy \
+  --prompt="Hierarchical movie genres with icons, colors, and descriptions"
+
+wp schema create movie-tag --type=taxonomy \
+  --prompt="Flat movie tags for filtering (e.g., oscar-winner, blockbuster, indie)"
+
+# 2. Validate and register
+wp schema validate movie --type=post-type
+wp schema validate movie-genre --type=taxonomy
+wp schema validate movie-tag --type=taxonomy
+wp schema register --type=all
+
+# 3. Configure Firestore sync
+wp syncfire config \
+  --project-id="${FIREBASE_PROJECT_ID}" \
+  --database-id="${FIREBASE_DATABASE_ID}" \
+  --service-account="${SERVICE_ACCOUNT_PATH}"
+
+# 4. Enable sync
+wp syncfire import post-type movie --auto-sync
+wp syncfire import taxonomy movie-genre --auto-sync --sync-now
+wp syncfire import taxonomy movie-tag --auto-sync --sync-now
+
+# 5. Test and verify
+wp syncfire test --verbose
+wp syncfire stats
+
+# 6. Generate frontend types
+wp schema export_all --type=all --output=./frontend/types
+
+# 7. Flush rewrite rules
+wp schema flush
+```
+
+This approach ensures:
+- Schema-first development
+- Automatic Firestore synchronization
+- Type-safe frontend development
+- Complete audit trail via CLI output
+- Reproducible deployments
+
+## Troubleshooting with CLI
+
+```bash
+# Check configuration
+wp syncfire status --format=json
+
+# Test connection
+wp syncfire test --verbose
+
+# List enabled syncs
+wp syncfire taxonomy list
+wp syncfire post-type list
+
+# Check specific post type fields
+wp syncfire post-type fields movie
+
+# View sync statistics
+wp syncfire stats
+
+# Manual sync trigger
+wp syncfire taxonomy sync category
+wp syncfire post-type sync movie
+```

@@ -86,6 +86,11 @@ class SyncFire {
         require_once plugin_dir_path( __FILE__ ) . 'includes/class-syncfire-settings-test.php';
         require_once plugin_dir_path( __FILE__ ) . 'includes/class-syncfire-migration.php';
         require_once SYNCFIRE_PLUGIN_DIR . 'includes/class-syncfire-hooks.php';
+
+        // Load WP-CLI command if WP-CLI is available
+        if (defined('WP_CLI') && WP_CLI) {
+            require_once SYNCFIRE_PLUGIN_DIR . 'cli/class-syncfire-command.php';
+        }
     }
 
     /**
